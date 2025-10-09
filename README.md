@@ -1,7 +1,7 @@
-# TopoReg-vessel
+# MorVess
 >📋 For code accompanying Muti-scale Transformer Knowledge Distillation Network of the paper
 
-# Bridging the Gap in Missing Modalities: Leveraging Knowledge Distillation and Style Matching for Brain Tumor Segmentation
+# Morphology-Aware Vessel Segmentation Network
 
 <div align="center">
 
