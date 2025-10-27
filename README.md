@@ -33,7 +33,7 @@ To overcome the challenges of missing or incomplete MRI modalities in brain tumo
 
 ## 🧗Proposed method
 <br><br>
-![](./imgs/fig1.png)
+![](./img/flowchart.png)
 <br><br>
 
 The overall framework of **MST-KDNet**. The Teacher propagation processes all available modalities, while the student propagation accommodates incomplete inputs.
