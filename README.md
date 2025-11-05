@@ -81,48 +81,160 @@ python eval.py
 
 Our model achieves the following performance on :
 
-\begin{table*}[ht]
-\centering
-\caption{\normalfont\normalsize Comparison of MorVess with other methods on the Parse2022 and AIIB2023 datasets. The \colorbox{red!40}{best}, \colorbox{orange!40}{second best}, and \colorbox{yellow!40}{third best} results are highlighted. 
-↑ indicates that higher is better, while ↓ indicates that lower is lower.}
-\label{tab:combined_results}
-\normalfont\normalsize
-\renewcommand{\arraystretch}{1.1}
-\setlength{\tabcolsep}{5pt} % 设置一个合适的列间距，\resizebox会按比例缩放
-
-\resizebox{\textwidth}{!}{%
-% --- 核心修改在这里 ---
-% 将所有 p{0.9cm}<{\centering} 修改为 c，让LaTeX自动计算列宽
-% 使用 *{6}{c} 是 c c c c c c 的简写，更清晰
-\begin{tabular}{
-l | *{6}{c} | *{6}{c} | c 
-}
-\toprule
-\multirow{2}{*}{\textbf{Method}} &
-\multicolumn{6}{c|}{\textbf{Parse2022 Dataset (98 cases)}} &
-\multicolumn{6}{c|}{\textbf{AIIB2023 Dataset (120 cases)}} &
-\multirow{2}{*}{\textbf{Code Avail}} \\
-\cmidrule(lr){2-7} \cmidrule(lr){8-13}
-& Dice↑ & Cldice↑ & HD\textsubscript{95}(mm)↓ & AMR↓ & DBR↑ & DLR↑
-& Dice↑ & Cldice↑ & HD\textsubscript{95}(mm)↓ & AMR↓ & DBR↑ & DLR↑ & \\ 
-\midrule
-% --- 表格数据内容保持不变 ---
-% UNet~\cite{xiao2018weighted} & 69.24 & 55.23 & 17.24 & 0.39 & 0.49 & 0.53 & 73.27 & 61.29 & 11.28 & 0.29 & 0.63 & 0.70 & \githubicon{https://github.com/black0017/MedicalZooPytorch.git} \\
-VISTA3d~\cite{he2024vista3d} & 67.24 & 63.21 & 14.23 & 0.33 & 0.55 & 0.68 & 83.81 & 76.24 & 9.23 & 0.25 & 0.58 & 0.67 & \githubicon{https://github.com/Project-MONAI/VISTA} \\
-nnunet-v2~\cite{liang2024automatic} & 77.28 & 75.31 & 9.53 & 0.22 & 0.66 & 0.72 & \cellcolor{yellow!40}92.83 & 84.31 & 5.92 & \cellcolor{yellow!40}0.10 & 0.77 & 0.83 & \githubicon{https://github.com/your/repo/url} \\
-Swin-unetr~\cite{hatamizadeh2021swin} & 76.85 & 70.19 & 11.26 & 0.28 & 0.61 & 0.75 & 90.53 & 80.13 & 8.42 & 0.19 & 0.74 & 0.78 & \githubicon{https://github.com/your/repo/url} \\
-Segmamba~\cite{xing2024segmamba} & 79.24 & 73.18 & 9.91 & 0.25 & 0.65 & 0.74 & 91.29 & 85.51 & \cellcolor{yellow!40}4.59 & 0.12 & 0.68 & 0.79 & \githubicon{https://github.com/your/repo/url} \\
-Diff-UNet~\cite{xing2025diff} & 76.24 & 71.26 & 9.65 & 0.27 & 0.62 & 0.68 & 90.48 & \cellcolor{yellow!40}86.32 & 4.67 & 0.11 & 0.64 & 0.76 & \githubicon{https://github.com/your/repo/url} \\
-dscNet~\cite{hu2023dsc} & \cellcolor{yellow!40}80.32 & \cellcolor{orange!40}81.03 & \cellcolor{yellow!40}5.35 & \cellcolor{yellow!40}0.16 & \cellcolor{yellow!40}0.73 & 0.78 & 92.15 & 85.22 & 5.39 & \cellcolor{yellow!40}0.10 & \cellcolor{orange!40}0.80 & 0.81 & \githubicon{https://github.com/your/repo/url} \\
-COMMA~\cite{shi2025comma} & \cellcolor{orange!40}83.27 & \cellcolor{yellow!40}80.10 & \cellcolor{orange!40}5.11 & \cellcolor{orange!40}0.14 & \cellcolor{orange!40}0.75 & \cellcolor{orange!40}0.79 & \cellcolor{orange!40}92.88 & \cellcolor{orange!40}86.23 & \cellcolor{orange!40}4.25 & \cellcolor{orange!40}0.09 & \cellcolor{yellow!40}0.81 & \cellcolor{orange!40}0.84 & \githubicon{https://github.com/your/repo/url} \\
-\midrule
-MorVess(Ours) & \cellcolor{red!40}86.84 & \cellcolor{red!40}83.22 & \cellcolor{red!40}4.53 & \cellcolor{red!40}0.12 & \cellcolor{red!40}0.80 & \cellcolor{red!40}0.83 & \cellcolor{red!40}94.31 & \cellcolor{red!40}89.34 & \cellcolor{red!40}3.24 & \cellcolor{red!40}0.07 & \cellcolor{red!40}0.86 & \cellcolor{red!40}0.89 & 
-\pul{https://github.com/MaoFuyou/MorVess.git}\\
-\bottomrule
-\end{tabular}
-}
-\end{table*}
-
+<table style="width:100%; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th rowspan="2" align="left" style="border: 1px solid #ddd; padding: 8px;"><b>Method</b></th>
+      <th colspan="6" align="center" style="border: 1px solid #ddd; padding: 8px;"><b>Parse2022 Dataset (98 cases)</b></th>
+      <th colspan="6" align="center" style="border: 1px solid #ddd; padding: 8px;"><b>AIIB2023 Dataset (120 cases)</b></th>
+      <th rowspan="2" align="center" style="border: 1px solid #ddd; padding: 8px;"><b>Code Avail</b></th>
+    </tr>
+    <tr>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">Dice↑</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">Cldice↑</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">HD<sub>95</sub>(mm)↓</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">AMR↓</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">DBR↑</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">DLR↑</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">Dice↑</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">Cldice↑</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">HD<sub>95</sub>(mm)↓</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">AMR↓</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">DBR↑</th>
+      <th align="center" style="border: 1px solid #ddd; padding: 8px;">DLR↑</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="left" style="border: 1px solid #ddd; padding: 8px;">VISTA3d</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">67.24</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">63.21</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">14.23</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.33</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.55</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.68</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">83.81</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">76.24</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">9.23</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.25</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.58</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.67</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><a href="https://github.com/Project-MONAI/VISTA">Code</a></td>
+    </tr>
+    <tr>
+      <td align="left" style="border: 1px solid #ddd; padding: 8px;">nnunet-v2</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">77.28</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">75.31</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">9.53</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.22</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.66</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.72</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">92.83</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">84.31</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">5.92</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.10</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.77</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.83</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><a href="https://github.com/your/repo/url">Code</a></td>
+    </tr>
+    <tr>
+      <td align="left" style="border: 1px solid #ddd; padding: 8px;">Swin-unetr</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">76.85</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">70.19</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">11.26</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.28</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.61</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.75</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">90.53</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">80.13</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">8.42</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.19</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.74</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.78</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><a href="https://github.com/your/repo/url">Code</a></td>
+    </tr>
+    <tr>
+      <td align="left" style="border: 1px solid #ddd; padding: 8px;">Segmamba</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">79.24</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">73.18</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">9.91</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.25</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.65</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.74</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">91.29</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">85.51</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">4.59</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.12</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.68</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.79</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><a href="https://github.com/your/repo/url">Code</a></td>
+    </tr>
+    <tr>
+      <td align="left" style="border: 1px solid #ddd; padding: 8px;">Diff-UNet</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">76.24</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">71.26</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">9.65</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.27</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.62</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.68</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">90.48</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">86.32</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">4.67</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.11</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.64</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.76</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><a href="https://github.com/your/repo/url">Code</a></td>
+    </tr>
+    <tr>
+      <td align="left" style="border: 1px solid #ddd; padding: 8px;">dscNet</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">80.32</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">81.03</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">5.35</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.16</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.73</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.78</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">92.15</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">85.22</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">5.39</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.10</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.80</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.81</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><a href="https://github.com/your/repo/url">Code</a></td>
+    </tr>
+    <tr>
+      <td align="left" style="border: 1px solid #ddd; padding: 8px;">COMMA</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">83.27</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">80.10</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">5.11</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.14</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.75</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.79</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">92.88</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">86.23</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">4.25</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.09</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.81</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;">0.84</td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><a href="https://github.com/your/repo/url">Code</a></td>
+    </tr>
+    <tr>
+      <td align="left" style="border: 1px solid #ddd; padding: 8px;"><b>MorVess(Ours)</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>86.84</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>83.22</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>4.53</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>0.12</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>0.80</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>0.83</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>94.31</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>89.34</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>3.24</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>0.07</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>0.86</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><b>0.89</b></td>
+      <td align="center" style="border: 1px solid #ddd; padding: 8px;"><a href="https://github.com/MaoFuyou/MorVess.git">Code</a></td>
+    </tr>
+  </tbody>
+</table>
 **2. Bimodal & Trimodal Gains**
 
 Adding a second or third modality further reduces boundary error and boosts accuracy. This improvement is driven by the **Global Style Matching Module (GSME)**, which adversarially aligns global feature statistics—mean and variance—between the student’s fused features and the teacher’s multi‑modal style. By correcting modality‑specific brightness and texture shifts, GSME ensures that the student sees a consistent “appearance” regardless of which sequences are present, sharpening tumor boundaries and reducing spurious errors.
