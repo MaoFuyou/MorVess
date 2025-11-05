@@ -16,13 +16,12 @@
 
 To overcome the challenges of missing or incomplete MRI modalities in brain tumor segmentation, we propose **MST-KDNet**. This is a novel framework for **cross-modality consistency** and **robust tumor segmentation in 3D medical images based on knowledge distillation and style matching**. Our key contributions are summarized as follows:
 
-1) 🕐 MST-KDNet architecture achieves **efficient segmentation** under **missing modalities** by selectively aligning multi-scale Transformer features. This design effectively bridges modality gaps while preserving tumor boundary details.
+1) 🕐 A geometry-prior-driven paradigm for vascular segmentation is proposed, in which the joint supervision of VTM and VDM significantly enhances the model’s topological and geometric awareness.
 
-2) 🕑 MST-KDNet significantly accelerates **inference**, **requiring only a compact distillation procedure instead of heavy fusion modules**, making it more adaptable to real-world clinical settings.
+2) 🕑 A lightweight and efficient 2.5D cross-slice attention framework with an FB is designed, substantially improving the continuity and completeness of fine vessels;
 
-3) 🕒 We introduce **Global Style Matching Module (GSME)** to harmonize **heterogeneous modality features** and **retain texture consistency** even with severely missing imaging signals, without extra costly training data.
+3) 🕒 A low-resource-friendly two-stage training strategy is developed, offering a new perspective for the efficient adaptation of large pre-trained models in 3D medical image segmentation tasks.
 
-4) 🕓 Extensive experiments on both the **BraTS 2024** and **FeTS 2024 datasets** demonstrate **superior performance** and **robustness** of MST-KDNet, achieving state-of-the-art results especially in scenarios with multiple missing modalities.
 
 ## 🧗Proposed method
 <br><br>
