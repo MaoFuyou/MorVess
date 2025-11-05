@@ -12,13 +12,6 @@
 </div>
 
 
-
-## 🎥Visualization for Implementation on Software 
-
-<div align="center">
-<img src="https://github.com/Quanato607/MST-KDNet/blob/main/imgs/implementation.gif" width="90%">
-</div>
-
 ## 💡Primary contributions
 
 To overcome the challenges of missing or incomplete MRI modalities in brain tumor segmentation, we propose **MST-KDNet**. This is a novel framework for **cross-modality consistency** and **robust tumor segmentation in 3D medical images based on knowledge distillation and style matching**. Our key contributions are summarized as follows:
