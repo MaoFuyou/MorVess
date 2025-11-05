@@ -81,35 +81,47 @@ python eval.py
 
 Our model achieves the following performance on :
 
----
+\begin{table*}[ht]
+\centering
+\caption{\normalfont\normalsize Comparison of MorVess with other methods on the Parse2022 and AIIB2023 datasets. The \colorbox{red!40}{best}, \colorbox{orange!40}{second best}, and \colorbox{yellow!40}{third best} results are highlighted. 
+↑ indicates that higher is better, while ↓ indicates that lower is lower.}
+\label{tab:combined_results}
+\normalfont\normalsize
+\renewcommand{\arraystretch}{1.1}
+\setlength{\tabcolsep}{5pt} % 设置一个合适的列间距，\resizebox会按比例缩放
 
-### Comparative Experiments on BraTS 2024
-
-**1. Unimodal Robustness**
-
-When only a single MRI sequence is available, MST‑KDNet still delivers both high Dice accuracy and low boundary error, thanks to its **Multi‑Scale Transformer Knowledge Distillation (MS‑TKD)** module, which aligns attention maps across resolutions to recover contextual cues. MS‑TKD works by distilling the teacher’s most salient attention patterns—peaks, troughs and average activations—into the student at every transformer layer, so that even with just one input, the student “knows” where tumors typically appear and how they span across scales.
-
-* **T2 only**
-
-  * Dice (WT/TC/ET): **77.2 % / 47.3 % / 48.3 %** vs. SMUNet’s 75.0 % / 29.3 % / 25.5 %
-  * HD95 (WT/TC/ET): **8.1 mm / 12.0 mm / 11.7 mm** vs. SMUNet’s 9.1 mm / 14.0 mm / 13.5 mm
-
-* **T1Gd only**
-
-  * Dice: **72.9 % / 68.3 % / 68.6 %** vs. SMUNet’s 67.9 % / 64.1 % / 64.8 %
-  * HD95: **11.1 mm / 4.9 mm / 4.5 mm** vs. SMUNet’s 13.3 mm / 6.3 mm / 5.4 mm
-
-* **T1 only**
-
-  * Dice: **73.5 % / 44.5 % / 32.0 %** vs. SMUNet’s 69.6 % / 28.2 % / 25.0 %
-  * HD95: **11.0 mm / 11.2 mm / 10.5 mm** vs. SMUNet’s 5.9 mm / 14.0 mm / 14.0 mm
-
-* **FLAIR only**
-
-  * Dice: **84.7 % / 33.9 % / 40.6 %** vs. SMUNet’s 84.2 % / 28.8 % / 25.1 %
-  * HD95: **6.7 mm / 12.1 mm / 11.9 mm** vs. SMUNet’s 12.2 mm / 13.4 mm / 13.0 mm
-
-These results demonstrate MS‑TKD’s ability to impart global context—even when only one modality is present—yielding both higher overlap and tighter boundaries.
+\resizebox{\textwidth}{!}{%
+% --- 核心修改在这里 ---
+% 将所有 p{0.9cm}<{\centering} 修改为 c，让LaTeX自动计算列宽
+% 使用 *{6}{c} 是 c c c c c c 的简写，更清晰
+\begin{tabular}{
+l | *{6}{c} | *{6}{c} | c 
+}
+\toprule
+\multirow{2}{*}{\textbf{Method}} &
+\multicolumn{6}{c|}{\textbf{Parse2022 Dataset (98 cases)}} &
+\multicolumn{6}{c|}{\textbf{AIIB2023 Dataset (120 cases)}} &
+\multirow{2}{*}{\textbf{Code Avail}} \\
+\cmidrule(lr){2-7} \cmidrule(lr){8-13}
+& Dice↑ & Cldice↑ & HD\textsubscript{95}(mm)↓ & AMR↓ & DBR↑ & DLR↑
+& Dice↑ & Cldice↑ & HD\textsubscript{95}(mm)↓ & AMR↓ & DBR↑ & DLR↑ & \\ 
+\midrule
+% --- 表格数据内容保持不变 ---
+% UNet~\cite{xiao2018weighted} & 69.24 & 55.23 & 17.24 & 0.39 & 0.49 & 0.53 & 73.27 & 61.29 & 11.28 & 0.29 & 0.63 & 0.70 & \githubicon{https://github.com/black0017/MedicalZooPytorch.git} \\
+VISTA3d~\cite{he2024vista3d} & 67.24 & 63.21 & 14.23 & 0.33 & 0.55 & 0.68 & 83.81 & 76.24 & 9.23 & 0.25 & 0.58 & 0.67 & \githubicon{https://github.com/Project-MONAI/VISTA} \\
+nnunet-v2~\cite{liang2024automatic} & 77.28 & 75.31 & 9.53 & 0.22 & 0.66 & 0.72 & \cellcolor{yellow!40}92.83 & 84.31 & 5.92 & \cellcolor{yellow!40}0.10 & 0.77 & 0.83 & \githubicon{https://github.com/your/repo/url} \\
+Swin-unetr~\cite{hatamizadeh2021swin} & 76.85 & 70.19 & 11.26 & 0.28 & 0.61 & 0.75 & 90.53 & 80.13 & 8.42 & 0.19 & 0.74 & 0.78 & \githubicon{https://github.com/your/repo/url} \\
+Segmamba~\cite{xing2024segmamba} & 79.24 & 73.18 & 9.91 & 0.25 & 0.65 & 0.74 & 91.29 & 85.51 & \cellcolor{yellow!40}4.59 & 0.12 & 0.68 & 0.79 & \githubicon{https://github.com/your/repo/url} \\
+Diff-UNet~\cite{xing2025diff} & 76.24 & 71.26 & 9.65 & 0.27 & 0.62 & 0.68 & 90.48 & \cellcolor{yellow!40}86.32 & 4.67 & 0.11 & 0.64 & 0.76 & \githubicon{https://github.com/your/repo/url} \\
+dscNet~\cite{hu2023dsc} & \cellcolor{yellow!40}80.32 & \cellcolor{orange!40}81.03 & \cellcolor{yellow!40}5.35 & \cellcolor{yellow!40}0.16 & \cellcolor{yellow!40}0.73 & 0.78 & 92.15 & 85.22 & 5.39 & \cellcolor{yellow!40}0.10 & \cellcolor{orange!40}0.80 & 0.81 & \githubicon{https://github.com/your/repo/url} \\
+COMMA~\cite{shi2025comma} & \cellcolor{orange!40}83.27 & \cellcolor{yellow!40}80.10 & \cellcolor{orange!40}5.11 & \cellcolor{orange!40}0.14 & \cellcolor{orange!40}0.75 & \cellcolor{orange!40}0.79 & \cellcolor{orange!40}92.88 & \cellcolor{orange!40}86.23 & \cellcolor{orange!40}4.25 & \cellcolor{orange!40}0.09 & \cellcolor{yellow!40}0.81 & \cellcolor{orange!40}0.84 & \githubicon{https://github.com/your/repo/url} \\
+\midrule
+MorVess(Ours) & \cellcolor{red!40}86.84 & \cellcolor{red!40}83.22 & \cellcolor{red!40}4.53 & \cellcolor{red!40}0.12 & \cellcolor{red!40}0.80 & \cellcolor{red!40}0.83 & \cellcolor{red!40}94.31 & \cellcolor{red!40}89.34 & \cellcolor{red!40}3.24 & \cellcolor{red!40}0.07 & \cellcolor{red!40}0.86 & \cellcolor{red!40}0.89 & 
+\pul{https://github.com/MaoFuyou/MorVess.git}\\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
 
 **2. Bimodal & Trimodal Gains**
 
