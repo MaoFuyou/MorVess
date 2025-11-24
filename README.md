@@ -39,7 +39,9 @@
 Overview of the MorVess framework. MorVess is a novel geometry-regularized segmentation framework built upon a modified SAM architecture. It comprises three main components: (1) Lightweight \textbf{2.5D Adapters} injected into the frozen ViT encoder to efficiently capture inter-slice spatial context from 2.5D inputs. (2) A multi-head geometric decoder that, within a multi-task learning paradigm, jointly predicts the binary \textbf{Mask} and two continuous, differentiable geometric priors: the \textbf{Vessel Distance Map (VDM)} and the \textbf{Vessel Thickness Map (VTM)}. (3) A \textbf{Global-Local Fusion Block (GLFB)} that aggregates shallow ($F_{sha}$) and deep ($F_{dep}$) encoder features, decoder features ($F_{dec}$), and the self-predicted VDM and VTM to reconstruct high-fidelity vascular details. The framework employs a \textbf{two-stage fine-tuning strategy}: Stage 1 trains the 2.5D Adapters and decoder with a high learning rate (HLR); Stage 2 freezes the adapters and fine-tunes only the decoder and GLFB module with a low learning rate (LLR) to achieve progressive refinement from macro-structure adaptation to micro-topological details.
 
 Core Components:
+
 **Vessel Distance Map (VDM)**: Encodes the distance from each foreground voxel to the nearest vessel wall, forming a smooth boundary potential field.
+
 **Vessel Thickness Map (VTM)**: Provides continuous information about vessel caliber distribution based on the maximum inscribed sphere along the centerline.
 
 **Two-Stage Training**:
