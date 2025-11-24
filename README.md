@@ -20,9 +20,9 @@
 </div>
 
 ---
-<div align="left">
-## 🔥 Highlights
 
+## 🔥 Highlights
+<div align="left">
 > **"Explicit geometric intelligence meets foundation model adaptation."**
 
 * **Morphology-Aware Supervision:** Introduces differentiable **Vessel Distance Map (VDM)** and **Vessel Thickness Map (VTM)** to enforce boundary precision and caliber consistency.
