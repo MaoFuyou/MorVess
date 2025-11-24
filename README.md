@@ -32,24 +32,27 @@
 ## 🏗️ Architecture
 
 <div align="center">
-  <img src="assets/architecture_fig1.png" width="800">
+  <img src="/img/flowchart.png" width="800">
 </div>
 
-[cite_start]MorVess adopts a **Two-Stage Resource-Friendly Training Strategy**[cite: 86]:
-1.  **Stage I (Adaptation):** High Learning Rate (HLR) training of the 2.5D Adapter and Decoder heads while keeping SAM frozen.
-2.  **Stage II (Refinement):** Low Learning Rate (LLR) fine-tuning for topological perfection.
+Overview of the MorVess framework. MorVess is a novel geometry-regularized segmentation framework built upon a modified SAM architecture. It comprises three main components: (1) Lightweight \textbf{2.5D Adapters} injected into the frozen ViT encoder to efficiently capture inter-slice spatial context from 2.5D inputs. (2) A multi-head geometric decoder that, within a multi-task learning paradigm, jointly predicts the binary \textbf{Mask} and two continuous, differentiable geometric priors: the \textbf{Vessel Distance Map (VDM)} and the \textbf{Vessel Thickness Map (VTM)}. (3) A \textbf{Global-Local Fusion Block (GLFB)} that aggregates shallow ($F_{sha}$) and deep ($F_{dep}$) encoder features, decoder features ($F_{dec}$), and the self-predicted VDM and VTM to reconstruct high-fidelity vascular details. The framework employs a \textbf{two-stage fine-tuning strategy}: Stage 1 trains the 2.5D Adapters and decoder with a high learning rate (HLR); Stage 2 freezes the adapters and fine-tunes only the decoder and GLFB module with a low learning rate (LLR) to achieve progressive refinement from macro-structure adaptation to micro-topological details.
+
+Core Components:
+
+Vessel Distance Map (VDM): Encodes the distance from each foreground voxel to the nearest vessel wall, forming a smooth boundary potential field.
+
+Vessel Thickness Map (VTM): Provides continuous information about vessel caliber distribution based on the maximum inscribed sphere along the centerline.
+
+Two-Stage Training:
+
+Stage I (HLR): Freezes the SAM encoder; trains the Adapter and Decoder with a high learning rate.
+
+Stage II (LLR): Freezes the Adapter; fine-tunes the Decoder and GLFB with a low learning rate for topological refinement.
 
 ---
 
 ## 📊 Results
 
-### Quantitative Comparison (Parse2022)
-| Method | Dice (%) | clDice (%) | HD95 (mm) | Param (M) |
-| :--- | :---: | :---: | :---: | :---: |
-| nnU-Net V2 | 77.28 | 75.31 | 9.53 | 32.0 |
-| SegMamba | 79.24 | 73.18 | 9.91 | - |
-| COMMA | 83.27 | 80.10 | 5.11 | - |
-| **MorVess (Ours)** | **86.84** | **83.22** | **4.53** | **1.0 (Trainable)** |
 
 
 
@@ -67,23 +70,6 @@ To overcome the challenges of missing or incomplete MRI modalities in brain tumo
 
 
 ## 🧗Proposed method
-<br><br>
-![](./img/flowchart.png)
-<br><br>
-
-Overview of the MorVess framework. MorVess is a novel geometry-regularized segmentation framework built upon a modified SAM architecture. It comprises three main components: (1) Lightweight \textbf{2.5D Adapters} injected into the frozen ViT encoder to efficiently capture inter-slice spatial context from 2.5D inputs. (2) A multi-head geometric decoder that, within a multi-task learning paradigm, jointly predicts the binary \textbf{Mask} and two continuous, differentiable geometric priors: the \textbf{Vessel Distance Map (VDM)} and the \textbf{Vessel Thickness Map (VTM)}. (3) A \textbf{Global-Local Fusion Block (GLFB)} that aggregates shallow ($F_{sha}$) and deep ($F_{dep}$) encoder features, decoder features ($F_{dec}$), and the self-predicted VDM and VTM to reconstruct high-fidelity vascular details. The framework employs a \textbf{two-stage fine-tuning strategy}: Stage 1 trains the 2.5D Adapters and decoder with a high learning rate (HLR); Stage 2 freezes the adapters and fine-tunes only the decoder and GLFB module with a low learning rate (LLR) to achieve progressive refinement from macro-structure adaptation to micro-topological details.
-
-Core Components:
-
-Vessel Distance Map (VDM): Encodes the distance from each foreground voxel to the nearest vessel wall, forming a smooth boundary potential field.
-
-Vessel Thickness Map (VTM): Provides continuous information about vessel caliber distribution based on the maximum inscribed sphere along the centerline.
-
-Two-Stage Training:
-
-Stage I (HLR): Freezes the SAM encoder; trains the Adapter and Decoder with a high learning rate.
-
-Stage II (LLR): Freezes the Adapter; fine-tunes the Decoder and GLFB with a low learning rate for topological refinement.
 
 ## Table of Contents
 - [Requirements](#-Requirements)
