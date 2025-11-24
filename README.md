@@ -6,16 +6,16 @@
 
 <div align="center">
 
-[![Paper](https://img.shields.io/badge/Paper-Media_Image_Analysis-blue)](path/to/paper)
+[![Paper](https://img.shields.io/badge/Paper-Medical_Image_Analysis-blue)](path/to/paper)
 [![Framework](https://img.shields.io/badge/PyTorch-2.0-red)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
 [![SOTA](https://img.shields.io/badge/SOTA-Parse2022%20%26%20AIIB2023-yellow)]()
 
-<img src="assets/teaser_fig5.png" width="800px" >
+<img src="paper.png" width="800px" >
 
 **Fuyou Mao**, Yifei Chen*, Beining Wu, Lixin Lin, Jinnan Dai, Zhiling Li, Yilei Chen, Hao Zhang, Yan Tang**, Feiwei Qin**
 
-*Hangzhou Dianzi University | Central South University | Tsinghua University*
+* Central South University | Tsinghua University | Hangzhou Dianzi University*
 
 </div>
 
