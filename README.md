@@ -15,12 +15,12 @@
 
 **Fuyou Mao**, Yifei Chen*, Beining Wu, Lixin Lin, Jinnan Dai, Zhiling Li, Yilei Chen, Hao Zhang, Yan Tang**, Feiwei Qin**
 
-* Central South University | Tsinghua University | Hangzhou Dianzi University*
+* Central South University** | Tsinghua University* | Hangzhou Dianzi University
 
 </div>
 
 ---
-
+<div align="left">
 ## 🔥 Highlights
 
 > **"Explicit geometric intelligence meets foundation model adaptation."**
@@ -29,7 +29,7 @@
 * **Resource-Efficient:** A lightweight **2.5D Adapter** injects 3D context into a frozen SAM encoder.**Only 1.0M trainable parameters** (vs. 32M in nnU-Net).
 * **Topological Integrity:** Dynamic **Global-Local Fusion Block (GLFB)** significantly improves small-vessel connectivity.
 * **SOTA Performance:** Outperforms nnU-Net, Swin-UNETR, and SegMamba on **Parse2022** and **AIIB2023** benchmark.
-
+</div>
 ---
 ## 🏗️ Architecture
 
