@@ -1,6 +1,4 @@
-# MorVess
 <div align="center">
-
 
 # MorVess:Morphology-Aware Vessel Segmentation Network
 
