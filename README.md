@@ -1,15 +1,60 @@
 # MorVess
->📋 For code accompanying Muti-scale Transformer Knowledge Distillation Network of the paper
+<div align="center">
+>📋 MorVess: Morphology-Aware Vessel Segmentation Network
 
 # Morphology-Aware Vessel Segmentation Network
 
 <div align="center">
 
-[![](https://img.shields.io/github/stars/Quanato607/MST-KDNet)](https://github.com/Quanato607/MST-KDNet)
-[![](https://img.shields.io/github/forks/Quanato607/MST-KDNet)](https://github.com/Quanato607/MST-KDNet)
-[![](https://img.shields.io/badge/project-page-red.svg)](https://github.com/Quanato607/MST-KDNet)
-[![](https://img.shields.io/badge/arXiv-2403.01427-green.svg)](https://arxiv.org/abs/2030.12345)
+[![Paper](https://img.shields.io/badge/Paper-Media_Image_Analysis-blue)](path/to/paper)
+[![Framework](https://img.shields.io/badge/PyTorch-2.0-red)](https://pytorch.org/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
+[![SOTA](https://img.shields.io/badge/SOTA-Parse2022%20%26%20AIIB2023-yellow)]()
+
+<img src="assets/teaser_fig5.png" width="800px" >
+
+**Fuyou Mao**, Yifei Chen*, Beining Wu, Lixin Lin, Jinnan Dai, Zhiling Li, Yilei Chen, Hao Zhang, Yan Tang**, Feiwei Qin**
+
+*Hangzhou Dianzi University | Central South University | Tsinghua University*
+
 </div>
+
+---
+
+## 🔥 Highlights
+
+> **"Explicit geometric intelligence meets foundation model adaptation."**
+
+* [cite_start]**Morphology-Aware Supervision:** Introduces differentiable **Vessel Distance Map (VDM)** and **Vessel Thickness Map (VTM)** to enforce boundary precision and caliber consistency[cite: 59, 137, 138].
+* **Resource-Efficient:** A lightweight **2.5D Adapter** injects 3D context into a frozen SAM encoder. [cite_start]**Only 1.0M trainable parameters** (vs. 32M in nnU-Net)[cite: 60, 566].
+* [cite_start]**Topological Integrity:** Dynamic **Global-Local Fusion Block (GLFB)** significantly improves small-vessel connectivity[cite: 142].
+* [cite_start]**SOTA Performance:** Outperforms nnU-Net, Swin-UNETR, and SegMamba on **Parse2022** and **AIIB2023** benchmarks[cite: 504, 508].
+
+---
+## 🏗️ Architecture
+
+<div align="center">
+  <img src="assets/architecture_fig1.png" width="800">
+</div>
+
+[cite_start]MorVess adopts a **Two-Stage Resource-Friendly Training Strategy**[cite: 86]:
+1.  **Stage I (Adaptation):** High Learning Rate (HLR) training of the 2.5D Adapter and Decoder heads while keeping SAM frozen.
+2.  **Stage II (Refinement):** Low Learning Rate (LLR) fine-tuning for topological perfection.
+
+---
+
+## 📊 Results
+
+### Quantitative Comparison (Parse2022)
+| Method | Dice (%) | clDice (%) | HD95 (mm) | Param (M) |
+| :--- | :---: | :---: | :---: | :---: |
+| nnU-Net V2 | 77.28 | 75.31 | 9.53 | 32.0 |
+| SegMamba | 79.24 | 73.18 | 9.91 | - |
+| COMMA | 83.27 | 80.10 | 5.11 | - |
+| **MorVess (Ours)** | **86.84** | **83.22** | **4.53** | **1.0 (Trainable)** |
+
+
+
 
 
 ## 💡Primary contributions
