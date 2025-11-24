@@ -11,12 +11,12 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
 [![SOTA](https://img.shields.io/badge/SOTA-Parse2022%20%26%20AIIB2023-yellow)]()
 
-<img src="img/paper.png" width="800px" >
+
 
 **Fuyou Mao**, Yifei Chen*, Beining Wu, Lixin Lin, Jinnan Dai, Zhiling Li, Yilei Chen, Hao Zhang, Yan Tang**, Feiwei Qin**
 
 * Central South University** | Tsinghua University* | Hangzhou Dianzi University
-
+<img src="img/paper.png" width="800px" >
 </div>
 
 ---
