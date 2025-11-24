@@ -25,10 +25,10 @@
 
 > **"Explicit geometric intelligence meets foundation model adaptation."**
 
-* **Morphology-Aware Supervision:** Introduces differentiable **Vessel Distance Map (VDM)** and **Vessel Thickness Map (VTM)** to enforce boundary precision and caliber consistency[cite: 59, 137, 138].
-* **Resource-Efficient:** A lightweight **2.5D Adapter** injects 3D context into a frozen SAM encoder. [cite_start]**Only 1.0M trainable parameters** (vs. 32M in nnU-Net)[cite: 60, 566].
-* **Topological Integrity:** Dynamic **Global-Local Fusion Block (GLFB)** significantly improves small-vessel connectivity[cite: 142].
-* **SOTA Performance:** Outperforms nnU-Net, Swin-UNETR, and SegMamba on **Parse2022** and **AIIB2023** benchmarks[cite: 504, 508].
+* **Morphology-Aware Supervision:** Introduces differentiable **Vessel Distance Map (VDM)** and **Vessel Thickness Map (VTM)** to enforce boundary precision and caliber consistency.
+* **Resource-Efficient:** A lightweight **2.5D Adapter** injects 3D context into a frozen SAM encoder.**Only 1.0M trainable parameters** (vs. 32M in nnU-Net).
+* **Topological Integrity:** Dynamic **Global-Local Fusion Block (GLFB)** significantly improves small-vessel connectivity.
+* **SOTA Performance:** Outperforms nnU-Net, Swin-UNETR, and SegMamba on **Parse2022** and **AIIB2023** benchmark.
 
 ---
 ## 🏗️ Architecture
