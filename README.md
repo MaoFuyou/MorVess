@@ -10,7 +10,6 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Official PyTorch implementation of the paper published in _Pattern Recognition_**
 
 **Fuyou Mao · Yifei Chen · Beining Wu · Lixin Lin · Jinnan Dai · Zhiling Li · Yilei Chen · Yaqi Wang · Hao Zhang · Yan Tang · Huiyu Zhou · Feiwei Qin**
 
@@ -313,19 +312,20 @@ The evaluation scripts report Dice, clDice, HD95, and vessel-structure metrics. 
 Please cite the formally published _Pattern Recognition_ article:
 
 ```bibtex
-@article{mao2026morvess,
-  title   = {MorVess: Morphology-Aware Pulmonary Vessel Segmentation Network},
-  author  = {Mao, Fuyou and Chen, Yifei and Wu, Beining and Lin, Lixin and
-             Dai, Jinnan and Li, Zhiling and Chen, Yilei and Wang, Yaqi and
-             Zhang, Hao and Tang, Yan and Zhou, Huiyu and Qin, Feiwei},
-  journal = {Pattern Recognition},
-  year    = {2026},
-  note    = {Elsevier PII: S0031320326015141},
-  url     = {https://www.sciencedirect.com/science/article/abs/pii/S0031320326015141}
+@article{MAO2026114550,
+title = {MorVess: Morphology-aware pulmonary vessel segmentation network},
+journal = {Pattern Recognition},
+volume = {180},
+pages = {114550},
+year = {2026},
+issn = {0031-3203},
+doi = {https://doi.org/10.1016/j.patcog.2026.114550},
+url = {https://www.sciencedirect.com/science/article/pii/S0031320326015141},
+author = {Fuyou Mao and Yifei Chen and Beining Wu and Lixin Lin and Jinnan Dai and Zhiling Li and Yilei Chen and Yaqi Wang and Hao Zhang and Yan Tang and Huiyu Zhou and Feiwei Qin},
+keywords = {Pulmonary vessel, Geometric priors, Topological integrity, Foundation model adaptation},
+abstract = {Accurate pulmonary vessel segmentation remains challenging due to the sparse, tortuous, and multi-scale nature of vascular structures, where small branches are easily lost and topology integrity is difficult to preserve under voxel-wise supervision. Existing deep segmentation models primarily optimize binary masks, lacking explicit geometric constraints, thus struggling to recover continuous tubular morphology and fine vascular connectivity. In this study, we introduce MorVess, a morphology-aware segmentation framework that integrates differentiable geometric priors with large-scale foundation model adaptation to achieve fine-grained vascular parsing. MorVess jointly predicts vessel masks, distance maps, and thickness maps, providing explicit supervision for vascular boundaries, centerline consistency, and smooth diameter transitions. A lightweight 2.5D adapter bridges 3D spatial context and 2D SAM representations, while a global-local fusion block aggregates multi-level semantics and geometric cues for high-fidelity topology reconstruction. Across two challenging pulmonary CT benchmarks, MorVess delivers superior Dice, clDice, and HD95 scores, substantially improving small-vessel recovery and global connectivity. These results demonstrate that embedding geometric intelligence into pretrained vision models offers a principled and scalable pathway toward precise vessel analysis and clinically reliable structural quantification. Our source code is available at https://github.com/MaoFuyou/MorVess.}
 }
 ```
-
-The arXiv version is retained for open preprint access, but the journal article above is the preferred citation. The DOI can be added once its final metadata is publicly indexed.
 
 ---
 
