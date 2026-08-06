@@ -1,0 +1,67 @@
+cff-version: 1.2.0
+message: "If you use MorVess in your research, please cite the published Pattern Recognition article."
+title: "MorVess"
+type: software
+license: MIT
+repository-code: "https://github.com/MaoFuyou/MorVess"
+url: "https://www.sciencedirect.com/science/article/abs/pii/S0031320326015141"
+authors:
+  - family-names: Mao
+    given-names: Fuyou
+  - family-names: Chen
+    given-names: Yifei
+  - family-names: Wu
+    given-names: Beining
+  - family-names: Lin
+    given-names: Lixin
+  - family-names: Dai
+    given-names: Jinnan
+  - family-names: Li
+    given-names: Zhiling
+  - family-names: Chen
+    given-names: Yilei
+  - family-names: Wang
+    given-names: Yaqi
+  - family-names: Zhang
+    given-names: Hao
+  - family-names: Tang
+    given-names: Yan
+  - family-names: Zhou
+    given-names: Huiyu
+  - family-names: Qin
+    given-names: Feiwei
+identifiers:
+  - type: other
+    value: "S0031320326015141"
+    description: "Elsevier Publication Item Identifier (PII)"
+preferred-citation:
+  type: article
+  title: "MorVess: Morphology-Aware Pulmonary Vessel Segmentation Network"
+  authors:
+    - family-names: Mao
+      given-names: Fuyou
+    - family-names: Chen
+      given-names: Yifei
+    - family-names: Wu
+      given-names: Beining
+    - family-names: Lin
+      given-names: Lixin
+    - family-names: Dai
+      given-names: Jinnan
+    - family-names: Li
+      given-names: Zhiling
+    - family-names: Chen
+      given-names: Yilei
+    - family-names: Wang
+      given-names: Yaqi
+    - family-names: Zhang
+      given-names: Hao
+    - family-names: Tang
+      given-names: Yan
+    - family-names: Zhou
+      given-names: Huiyu
+    - family-names: Qin
+      given-names: Feiwei
+  journal: "Pattern Recognition"
+  year: 2026
+  url: "https://www.sciencedirect.com/science/article/abs/pii/S0031320326015141"

@@ -1,92 +1,108 @@
 <div align="center">
 
-# MorVess: Morphology-Aware Pulmonary Vessel Segmentation Network
+# MorVess
 
-[![Pattern Recognition](https://img.shields.io/badge/Pattern%20Recognition-Accepted-2ea44f.svg)](https://www.sciencedirect.com/journal/pattern-recognition)
+### Morphology-Aware Pulmonary Vessel Segmentation Network
+
+[![Pattern Recognition](https://img.shields.io/badge/Pattern%20Recognition-Published-1f6feb.svg)](https://www.sciencedirect.com/science/article/abs/pii/S0031320326015141)
 [![arXiv](https://img.shields.io/badge/arXiv-2606.24214-b31b1b.svg)](https://arxiv.org/abs/2606.24214)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+**Official PyTorch implementation of the paper published in _Pattern Recognition_**
+
 **Fuyou Mao · Yifei Chen · Beining Wu · Lixin Lin · Jinnan Dai · Zhiling Li · Yilei Chen · Yaqi Wang · Hao Zhang · Yan Tang · Huiyu Zhou · Feiwei Qin**
 
-[Paper](https://arxiv.org/abs/2606.24214) · [PDF](https://arxiv.org/pdf/2606.24214) · [Code](https://github.com/MaoFuyou/MorVess)
+[Official Paper](https://www.sciencedirect.com/science/article/abs/pii/S0031320326015141) ·
+[arXiv](https://arxiv.org/abs/2606.24214) ·
+[PDF](https://arxiv.org/pdf/2606.24214) ·
+[Code](https://github.com/MaoFuyou/MorVess) ·
+[Citation](#citation)
 
 </div>
 
 > [!IMPORTANT]
-> 🎉 **MorVess has been formally accepted by _Pattern Recognition_ (July 2026).**  
-> The final journal page, DOI, volume, and page information are not yet available and will be added after online publication. The current manuscript is available on arXiv.
+> 🎉 **MorVess has been formally published online in _Pattern Recognition_ (2026).**  
+> Please cite the journal article rather than the arXiv preprint.
+
+---
+
+## News
+
+- **August 2026:** The official _Pattern Recognition_ article page is online.
+- **June 2026:** The MorVess preprint and source code were released.
 
 ---
 
 ## Overview
 
-Accurate pulmonary vessel segmentation remains difficult because pulmonary vasculature is sparse, tortuous, highly multi-scale, and topologically complex. Conventional voxel-wise supervision often misses small branches and produces discontinuous or geometrically inconsistent vessel trees.
+Pulmonary vessel segmentation is challenging because the vascular tree is sparse, tortuous, highly multi-scale, and topologically complex. Conventional voxel-wise objectives frequently miss distal branches, break vascular connectivity, and produce geometrically inconsistent vessel trees.
 
-**MorVess** is a morphology-aware segmentation framework that integrates differentiable geometric priors with parameter-efficient adaptation of the Segment Anything Model (SAM). In addition to the binary vessel mask, MorVess jointly predicts:
+**MorVess** reformulates pulmonary vessel segmentation as a joint semantic and geometric reconstruction problem. It adapts a frozen Segment Anything Model (SAM) encoder to volumetric chest CT and jointly predicts:
 
-- **Vessel Distance Map (VDM):** a continuous boundary-aware potential field;
-- **Vessel Thickness Map (VTM):** a continuous representation of local vessel caliber.
+- a binary pulmonary vessel mask;
+- a **Vessel Distance Map (VDM)** for boundary-aware geometric supervision;
+- a **Vessel Thickness Map (VTM)** for local-caliber consistency.
 
-A lightweight **2.5D Adapter** injects inter-slice context into the frozen SAM image encoder, while a **Global–Local Fusion Block (GLFB)** combines multi-level semantic features with self-predicted geometric cues to reconstruct fine and topologically continuous pulmonary vessels.
-
----
-
-## Highlights
-
-- **Morphology-aware supervision.** VDM and VTM explicitly constrain vessel boundaries, centerline continuity, and smooth caliber transitions.
-- **Parameter-efficient foundation-model adaptation.** The 2.5D Adapter bridges volumetric CT context and 2D SAM representations with only **1.0M trainable parameters**.
-- **Geometry-guided feature fusion.** GLFB integrates shallow, deep, decoder, distance, thickness, and gradient features for high-fidelity vessel reconstruction.
-- **Progressive two-stage optimization.** Training proceeds from macro-structural adaptation to micro-topological refinement.
-- **Strong performance and low resource cost.** MorVess achieves leading results on Parse2022 and AIIB2023 while using approximately **4.2 GB** peak GPU memory under the reported setting.
-
----
-
-## Method
-
-### Overall Architecture
+A lightweight **2.5D Adapter** introduces inter-slice context into the SAM image encoder. A **Global–Local Fusion Block (GLFB)** combines multi-level semantic features with geometric cues to recover thin branches and preserve global vascular connectivity.
 
 <p align="center">
   <img src="Fig1.png" alt="Overview of the MorVess framework" width="100%"/>
 </p>
 
-MorVess consists of three principal components:
+---
 
-1. **Lightweight 2.5D Adapter**  
-   The adapter is inserted into the frozen SAM ViT encoder to model cross-slice spatial context from a five-slice input stack.
+## Highlights
 
-2. **Multi-head Geometric Decoder**  
-   The decoder jointly predicts the segmentation mask, VDM, and VTM under a multi-task learning formulation.
+- **Explicit geometric priors.** VDM and VTM supervise vessel boundaries, centerline continuity, and smooth diameter transitions.
+- **Parameter-efficient foundation-model adaptation.** A lightweight 2.5D adapter connects volumetric CT context with frozen 2D SAM representations.
+- **Geometry-guided feature fusion.** GLFB integrates shallow, deep, decoder, distance, thickness, and gradient features.
+- **Progressive optimization.** Training moves from macro-structural adaptation to micro-topological refinement.
+- **Strong structural performance.** MorVess improves small-vessel recovery and global connectivity on Parse2022 and AIIB2023.
+- **Low trainable-parameter footprint.** The reported configuration uses approximately **1.0M trainable parameters**.
 
-3. **Global–Local Fusion Block (GLFB)**  
-   GLFB aggregates shallow encoder features, deep encoder features, decoder features, VDM, VTM, and the VDM gradient to refine fine branches and preserve global vessel connectivity.
+---
 
-### Differentiable Geometric Priors
+## Method
+
+### 1. Lightweight 2.5D Adapter
+
+The adapter is inserted into the frozen SAM ViT encoder and processes a five-slice input stack. It injects cross-slice context without fully fine-tuning the foundation-model backbone.
+
+### 2. Multi-head Geometric Decoder
+
+The decoder jointly predicts the vessel mask, VDM, and VTM under a multi-task learning objective, allowing semantic and geometric representations to be optimized together.
+
+### 3. Global–Local Fusion Block
+
+GLFB aggregates shallow encoder features, deep encoder features, decoder features, VDM, VTM, and VDM gradients to refine distal branches while preserving the global vessel tree.
+
+### Vessel Distance Map
 
 <p align="center">
   <img src="Fig2.png" alt="Vessel Distance Map generation" width="100%"/>
 </p>
 
-**Vessel Distance Map (VDM).** VDM converts the discrete vessel boundary into a continuous potential field that decays with the physical distance to the vessel wall:
+VDM converts a discrete vessel boundary into a continuous boundary-aware potential field:
 
 $$
 \mathrm{VDM}(x)=\exp\left(-\lambda\min_{y\in\partial\Omega}\left\|(x-y)\odot S_p\right\|_2\right).
 $$
 
+### Vessel Thickness Map
+
 <p align="center">
   <img src="Fig3.png" alt="Vessel Thickness Map generation" width="100%"/>
 </p>
 
-**Vessel Thickness Map (VTM).** VTM propagates the diameter estimated from the maximum inscribed sphere along the vessel centerline to the complete vessel region:
+VTM propagates centerline diameter estimates to the complete vessel region:
 
 $$
 \mathrm{VTM}(x)=2D_{\mathrm{internal}}\left(\arg\min_{s\in S}\left\|(x-s)\odot S_p\right\|_2\right).
 $$
 
 ### Training Objective
-
-The overall objective combines voxel-level segmentation, topology preservation, and geometric regression:
 
 $$
 \mathcal{L}_{\mathrm{total}}=
@@ -97,11 +113,11 @@ $$
 \lambda_5\mathcal{L}_{\mathrm{thick}}.
 $$
 
-| Loss | Purpose |
+| Loss | Role |
 |---|---|
-| $\mathcal{L}_{\mathrm{CE}}$ | Voxel-wise foreground/background classification |
+| $\mathcal{L}_{\mathrm{CE}}$ | Voxel-wise vessel classification |
 | $\mathcal{L}_{\mathrm{Dice}}$ | Region-overlap optimization under class imbalance |
-| $\mathcal{L}_{\mathrm{clDice}}$ | Centerline and topological consistency |
+| $\mathcal{L}_{\mathrm{clDice}}$ | Centerline and topology preservation |
 | $\mathcal{L}_{\mathrm{dist}}$ | Boundary-aware VDM regression |
 | $\mathcal{L}_{\mathrm{thick}}$ | Scale-normalized VTM regression |
 
@@ -115,6 +131,13 @@ $$
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Parse2022 | **86.84 ± 4.18** | **83.22 ± 3.17** | **4.53 ± 3.06** | **0.12 ± 0.09** | **0.80 ± 0.08** | **0.83 ± 0.08** |
 | AIIB2023 | **94.31 ± 3.52** | **89.34 ± 3.46** | **3.24 ± 4.81** | **0.07 ± 0.04** | **0.86 ± 0.09** | **0.89 ± 0.16** |
+
+### Cross-domain Generalization
+
+| Train Domain | Test Domain | Dice ↑ | clDice ↑ | HD95 ↓ |
+|---|---|:---:|:---:|:---:|
+| Parse2022 | HiPas | **81.14 ± 3.58** | **78.42 ± 4.20** | **7.18 ± 2.12** |
+| AIIB2023 | ATM2022 | **89.25 ± 2.45** | **86.75 ± 3.10** | **4.22 ± 1.30** |
 
 ### Computational Efficiency
 
@@ -139,7 +162,9 @@ MorVess better preserves thin terminal branches, reduces vessel discontinuities,
 ```text
 MorVess/
 ├── README.md
-├── MorVess_Development_Guide.md
+├── CITATION.cff
+├── CITATION.bib
+├── LICENSE
 ├── train_hq_parse_stage1.py
 ├── train_hq_parse_stage2.py
 ├── test_parse_stage1.py
@@ -154,12 +179,6 @@ MorVess/
 └── segment_anything/
     ├── build_sam.py
     └── modeling/
-        ├── image_encoder_hq.py
-        ├── mask_decoder_hq.py
-        ├── hq_refiner.py
-        ├── sam_distance_hq.py
-        ├── transformer.py
-        └── prompt_encoder.py
 ```
 
 ---
@@ -175,21 +194,20 @@ MorVess/
 ### Setup
 
 ```bash
-# Clone the repository
 git clone https://github.com/MaoFuyou/MorVess.git
 cd MorVess
 
-# Install PyTorch (CUDA 11.8 example)
+# PyTorch with CUDA 11.8
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 
-# Install the remaining dependencies
+# Remaining dependencies
 pip install SimpleITK nibabel scipy numpy pandas einops icecream \
     opencv-python Pillow tqdm h5py
 ```
 
 ### SAM Pretrained Weights
 
-Download the SAM ViT-Base checkpoint [`sam_vit_b_01ec64.pth`](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth) and place it in:
+Download the SAM ViT-B checkpoint [`sam_vit_b_01ec64.pth`](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth) and place it at:
 
 ```text
 pretrained_weights/sam_vit_b_01ec64.pth
@@ -199,12 +217,12 @@ pretrained_weights/sam_vit_b_01ec64.pth
 
 ## Datasets
 
-| Dataset | Task | Size / Characteristic |
+| Dataset | Task | Description |
 |---|---|---|
 | [Parse2022](https://parse2022.grand-challenge.org/) | Pulmonary artery segmentation | 100 high-resolution 3D chest CT volumes |
-| [AIIB2023](https://zenodo.org/records/10041596) | Pulmonary vessel segmentation under pathological deformation | Fibrotic CT data for robustness and cross-domain evaluation |
+| [AIIB2023](https://zenodo.org/records/10041596) | Pulmonary vessel segmentation | Fibrotic CT data for robustness evaluation |
 
-Please follow the licenses and data-use requirements of the original datasets.
+Please follow the license and data-use requirements of each original dataset.
 
 ### Preprocessing Pipeline
 
@@ -212,13 +230,11 @@ Please follow the licenses and data-use requirements of the original datasets.
 Raw 3D CT and vessel mask
         │
         ├── HU clipping and intensity normalization
-        ├── VDM generation
-        ├── VTM generation
-        ├── 2.5D five-slice construction
+        ├── Vessel Distance Map generation
+        ├── Vessel Thickness Map generation
+        ├── 2.5D five-slice sample construction
         └── CSV index generation
 ```
-
-Example commands:
 
 ```bash
 # Generate Vessel Distance Maps
@@ -241,9 +257,9 @@ python preprocessing/util_script_parse2022_ok.py
 
 ## Training
 
-MorVess uses a two-stage optimization strategy.
+MorVess uses a progressive two-stage optimization strategy.
 
-### Stage I: Macro-structural Adaptation
+### Stage I — Macro-structural Adaptation
 
 ```bash
 python train_hq_parse_stage1.py \
@@ -255,7 +271,7 @@ python train_hq_parse_stage1.py \
     --max_epochs 400
 ```
 
-### Stage II: Micro-topological Refinement
+### Stage II — Micro-topological Refinement
 
 ```bash
 python train_hq_parse_stage2.py \
@@ -271,7 +287,6 @@ python train_hq_parse_stage2.py \
 |---|---|---|
 | Main goal | Spatial and cross-slice adaptation | Fine topology refinement |
 | Resolution | 512 × 512 | 256 × 256 |
-| Trainable components | 2.5D Adapter, decoder, GLFB | Decoder, GLFB, geometric heads |
 | Learning rate | $1\times10^{-5}$ | $5\times10^{-5}$ |
 | Batch size | 1 | 8 |
 
@@ -289,13 +304,13 @@ python test_parse_stage1.py \
     --is_savenii
 ```
 
-The evaluation scripts report Dice, clDice, HD95, and additional vessel-structure metrics. Predicted NIfTI masks are saved to the specified output directory when `--is_savenii` is enabled.
+The evaluation scripts report Dice, clDice, HD95, and vessel-structure metrics. Predicted NIfTI masks are written to the selected output directory when `--is_savenii` is enabled.
 
 ---
 
 ## Citation
 
-The final bibliographic information for the _Pattern Recognition_ version is not yet available. Until the article is published online, please cite the arXiv preprint:
+Please cite the formally published _Pattern Recognition_ article:
 
 ```bibtex
 @article{mao2026morvess,
@@ -303,13 +318,14 @@ The final bibliographic information for the _Pattern Recognition_ version is not
   author  = {Mao, Fuyou and Chen, Yifei and Wu, Beining and Lin, Lixin and
              Dai, Jinnan and Li, Zhiling and Chen, Yilei and Wang, Yaqi and
              Zhang, Hao and Tang, Yan and Zhou, Huiyu and Qin, Feiwei},
-  journal = {arXiv preprint arXiv:2606.24214},
+  journal = {Pattern Recognition},
   year    = {2026},
-  doi     = {10.48550/arXiv.2606.24214}
+  note    = {Elsevier PII: S0031320326015141},
+  url     = {https://www.sciencedirect.com/science/article/abs/pii/S0031320326015141}
 }
 ```
 
-> **Publication status:** Accepted by _Pattern Recognition_. The citation above will be replaced with the final journal citation after the DOI and publication metadata become available.
+The arXiv version is retained for open preprint access, but the journal article above is the preferred citation. The DOI can be added once its final metadata is publicly indexed.
 
 ---
 
@@ -327,4 +343,8 @@ This project is released under the [MIT License](LICENSE).
 
 ## Contact
 
-For questions about the paper or code, please open a GitHub issue in this repository.
+For questions about the paper or code, please open an issue in this repository.
+
+---
+
+**Keywords:** pulmonary vessel segmentation, medical image segmentation, chest CT, SAM, foundation model adaptation, geometric priors, topology preservation, vessel distance map, vessel thickness map, 2.5D deep learning
