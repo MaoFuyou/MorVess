@@ -11,18 +11,18 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 
-**Fuyou Mao Â· Yifei Chen Â· Beining Wu Â· Lixin Lin Â· Jinnan Dai Â· Zhiling Li Â· Yilei Chen Â· Yaqi Wang Â· Hao Zhang Â· Yan Tang Â· Huiyu Zhou Â· Feiwei Qin**
+**Fuyou Mao · Yifei Chen · Beining Wu · Lixin Lin · Jinnan Dai · Zhiling Li · Yilei Chen · Yaqi Wang · Hao Zhang · Yan Tang · Huiyu Zhou · Feiwei Qin**
 
-[Official Paper](https://www.sciencedirect.com/science/article/abs/pii/S0031320326015141) Â·
-[arXiv](https://arxiv.org/abs/2606.24214) Â·
-[PDF](https://arxiv.org/pdf/2606.24214) Â·
-[Code](https://github.com/MaoFuyou/MorVess) Â·
+[Official Paper](https://www.sciencedirect.com/science/article/abs/pii/S0031320326015141) ·
+[arXiv](https://arxiv.org/abs/2606.24214) ·
+[PDF](https://arxiv.org/pdf/2606.24214) ·
+[Code](https://github.com/MaoFuyou/MorVess) ·
 [Citation](#citation)
 
 </div>
 
 > [!IMPORTANT]
-> ð **MorVess has been formally published online in _Pattern Recognition_ (2026).**  
+> 🎉 **MorVess has been formally published online in _Pattern Recognition_ (2026).**  
 > Please cite the journal article rather than the arXiv preprint.
 
 ---
@@ -44,7 +44,7 @@ Pulmonary vessel segmentation is challenging because the vascular tree is sparse
 - a **Vessel Distance Map (VDM)** for boundary-aware geometric supervision;
 - a **Vessel Thickness Map (VTM)** for local-caliber consistency.
 
-A lightweight **2.5D Adapter** introduces inter-slice context into the SAM image encoder. A **GlobalâLocal Fusion Block (GLFB)** combines multi-level semantic features with geometric cues to recover thin branches and preserve global vascular connectivity.
+A lightweight **2.5D Adapter** introduces inter-slice context into the SAM image encoder. A **Global–Local Fusion Block (GLFB)** combines multi-level semantic features with geometric cues to recover thin branches and preserve global vascular connectivity.
 
 <p align="center">
   <img src="Fig1.png" alt="Overview of the MorVess framework" width="100%"/>
@@ -73,7 +73,7 @@ The adapter is inserted into the frozen SAM ViT encoder and processes a five-sli
 
 The decoder jointly predicts the vessel mask, VDM, and VTM under a multi-task learning objective, allowing semantic and geometric representations to be optimized together.
 
-### 3. GlobalâLocal Fusion Block
+### 3. Global–Local Fusion Block
 
 GLFB aggregates shallow encoder features, deep encoder features, decoder features, VDM, VTM, and VDM gradients to refine distal branches while preserving the global vessel tree.
 
@@ -126,17 +126,17 @@ $$
 
 ### Quantitative Performance
 
-| Dataset | Dice â | clDice â | HD95 (mm) â | AMR â | DBR â | DLR â |
+| Dataset | Dice ↑ | clDice ↑ | HD95 (mm) ↓ | AMR ↓ | DBR ↑ | DLR ↑ |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
-| Parse2022 | **86.84 Â± 4.18** | **83.22 Â± 3.17** | **4.53 Â± 3.06** | **0.12 Â± 0.09** | **0.80 Â± 0.08** | **0.83 Â± 0.08** |
-| AIIB2023 | **94.31 Â± 3.52** | **89.34 Â± 3.46** | **3.24 Â± 4.81** | **0.07 Â± 0.04** | **0.86 Â± 0.09** | **0.89 Â± 0.16** |
+| Parse2022 | **86.84 ± 4.18** | **83.22 ± 3.17** | **4.53 ± 3.06** | **0.12 ± 0.09** | **0.80 ± 0.08** | **0.83 ± 0.08** |
+| AIIB2023 | **94.31 ± 3.52** | **89.34 ± 3.46** | **3.24 ± 4.81** | **0.07 ± 0.04** | **0.86 ± 0.09** | **0.89 ± 0.16** |
 
 ### Cross-domain Generalization
 
-| Train Domain | Test Domain | Dice â | clDice â | HD95 â |
+| Train Domain | Test Domain | Dice ↑ | clDice ↑ | HD95 ↓ |
 |---|---|:---:|:---:|:---:|
-| Parse2022 | HiPas | **81.14 Â± 3.58** | **78.42 Â± 4.20** | **7.18 Â± 2.12** |
-| AIIB2023 | ATM2022 | **89.25 Â± 2.45** | **86.75 Â± 3.10** | **4.22 Â± 1.30** |
+| Parse2022 | HiPas | **81.14 ± 3.58** | **78.42 ± 4.20** | **7.18 ± 2.12** |
+| AIIB2023 | ATM2022 | **89.25 ± 2.45** | **86.75 ± 3.10** | **4.22 ± 1.30** |
 
 ### Computational Efficiency
 
@@ -160,29 +160,29 @@ MorVess better preserves thin terminal branches, reduces vessel discontinuities,
 
 ```text
 MorVess/
-âââ README.md
-âââ CITATION.cff
-âââ CITATION.bib
-âââ LICENSE
-âââ requirements.txt
-âââ sam_fact_tt_image_encoder_hq.py
-âââ trainer_hq_parse.py
-âââ trainer_hq_parse_stage2.py
-âââ utils.py
-âââ train_hq_parse_stage1.py
-âââ train_hq_parse_stage2.py
-âââ test_parse_stage1.py
-âââ test_parse_stage2.py
-âââ generate_distance_map.py
-âââ generate_distance_process.py
-âââ generate_batch_distance_map.py
-âââ generate_thickness.py
-âââ generate_thickness_process.py
-âââ datasets/
-âââ preprocessing/
-âââ segment_anything/
-    âââ build_sam.py
-    âââ modeling/
+├── README.md
+├── CITATION.cff
+├── CITATION.bib
+├── LICENSE
+├── requirements.txt
+├── sam_fact_tt_image_encoder_hq.py
+├── trainer_hq_parse.py
+├── trainer_hq_parse_stage2.py
+├── utils.py
+├── train_hq_parse_stage1.py
+├── train_hq_parse_stage2.py
+├── test_parse_stage1.py
+├── test_parse_stage2.py
+├── generate_distance_map.py
+├── generate_distance_process.py
+├── generate_batch_distance_map.py
+├── generate_thickness.py
+├── generate_thickness_process.py
+├── datasets/
+├── preprocessing/
+└── segment_anything/
+    ├── build_sam.py
+    └── modeling/
 ```
 
 ---
@@ -231,12 +231,12 @@ Please follow the license and data-use requirements of each original dataset.
 
 ```text
 Raw 3D CT and vessel mask
-        â
-        âââ HU clipping and intensity normalization
-        âââ Vessel Distance Map generation
-        âââ Vessel Thickness Map generation
-        âââ 2.5D five-slice sample construction
-        âââ CSV index generation
+        │
+        ├── HU clipping and intensity normalization
+        ├── Vessel Distance Map generation
+        ├── Vessel Thickness Map generation
+        ├── 2.5D five-slice sample construction
+        └── CSV index generation
 ```
 
 ```bash
@@ -274,7 +274,7 @@ those volumes into the five-slice `boundary_potential/2Dboundary_*.pkl` and
 
 MorVess uses a progressive two-stage optimization strategy.
 
-### Stage I â Macro-structural Adaptation
+### Stage I — Macro-structural Adaptation
 
 ```bash
 python train_hq_parse_stage1.py \
@@ -286,7 +286,7 @@ python train_hq_parse_stage1.py \
     --max_epochs 400
 ```
 
-### Stage II â Micro-topological Refinement
+### Stage II — Micro-topological Refinement
 
 ```bash
 python train_hq_parse_stage2.py \
@@ -302,7 +302,7 @@ python train_hq_parse_stage2.py \
 | Setting | Stage I | Stage II |
 |---|---|---|
 | Main goal | Spatial and cross-slice adaptation | Fine topology refinement |
-| Resolution | 512 Ã 512 | 512 Ã 512 |
+| Resolution | 512 × 512 | 512 × 512 |
 | Learning rate | $1\times10^{-5}$ | $5\times10^{-5}$ |
 | Batch size | 1 | 8 |
 
