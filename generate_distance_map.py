@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-æ­¤èæ¬ç¨äºå¤ç 3D NIfTI æ ¼å¼çè¡ç®¡åå²æ©æ¨¡ï¼maskï¼ï¼å¹¶çæä¸¤ç§ç±»åçè¡ç®¡è·ç¦»å¾ï¼
-1. åé¨è·ç¦»å¾ (Internal Distance Map): ä»å¨è¡ç®¡åé¨æ¾ç¤ºå°èæ¯çæç­è·ç¦»ï¼åæ è¡ç®¡çä¸­å¿çº¿åååº¦ã
-2. è¾¹çå¿åºå¾ (Boundary Potential Map): å¨è¡ç®¡è¾¹çå¤å¼æé«ï¼ååå¤å¹³æ»è¡°åï¼ç¨äºå¼å¯¼ç½ç»å­¦ä¹ è¾¹çã
+此脚本用于处理 3D NIfTI 格式的血管分割掩模（mask），并生成两种类型的血管距离图：
+1. 内部距离图 (Internal Distance Map): 仅在血管内部显示到背景的最短距离，反映血管的中心线和厚度。
+2. 边界势场图 (Boundary Potential Map): 在血管边界处值最高，向内外平滑衰减，用于引导网络学习边界。
 
-è¯·ç¡®ä¿å·²å®è£å¿è¦çåº:
+请确保已安装必要的库:
 pip install SimpleITK numpy scipy
 """
 import SimpleITK as sitk
@@ -15,119 +15,119 @@ import argparse
 
 def generate_distance_maps(mask_path, output_dir, lambda_param=0.5):
     """
-    ä»ä¸ä¸ª NIfTI æ ¼å¼çæ©æ¨¡æä»¶çæè¡ç®¡è·ç¦»å¾ã
+    从一个 NIfTI 格式的掩模文件生成血管距离图。
 
-    åæ°:
-    - mask_path (str): è¾å¥çæ©æ¨¡æä»¶è·¯å¾ (.nii.gz)ã
-    - output_dir (str): è¾åºæä»¶çä¿å­ç®å½ã
-    - lambda_param (float): è¾¹çå¿åºå¾ä¸­ææ°è¡°åçç³»æ°ï¼å¯æ ¹æ®éè¦è°æ´ã
-                           å¼è¶å°ï¼å¿åºèå´è¶å¹¿ï¼å¼è¶å¤§ï¼å¿åºè¶éä¸­å¨è¾¹çã
+    参数:
+    - mask_path (str): 输入的掩模文件路径 (.nii.gz)。
+    - output_dir (str): 输出文件的保存目录。
+    - lambda_param (float): 边界势场图中指数衰减的系数，可根据需要调整。
+                           值越小，势场范围越广；值越大，势场越集中在边界。
     """
     if not os.path.exists(mask_path):
-        print(f"éè¯¯ï¼è¾å¥æä»¶ä¸å­å¨ -> {mask_path}")
+        print(f"错误：输入文件不存在 -> {mask_path}")
         return
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-        print(f"åå»ºè¾åºç®å½: {output_dir}")
+        print(f"创建输出目录: {output_dir}")
 
-    print(f"æ­£å¨å¤çæä»¶: {mask_path}")
+    print(f"正在处理文件: {mask_path}")
 
-    # 1. ä½¿ç¨ SimpleITK å è½½ NIfTI æä»¶
-    # SimpleITK å¯ä»¥å¾å¥½å°ä¿çå¾åçåæ°æ®ï¼å¦spacing, origin, directionï¼
+    # 1. 使用 SimpleITK 加载 NIfTI 文件
+    # SimpleITK 可以很好地保留图像的元数据（如spacing, origin, direction）
     mask_image = sitk.ReadImage(mask_path, sitk.sitkFloat32)
     mask_array = sitk.GetArrayFromImage(mask_image)
 
-    # ç¡®ä¿æ©æ¨¡æ¯äºå¼ç (0 æ 1)
+    # 确保掩模是二值的 (0 或 1)
     mask_array = (mask_array > 0).astype(np.uint8)
 
-    # --- çæåé¨è·ç¦»å¾ (Internal Distance Map) ---
-    # è®¡ç®ä»æ¯ä¸ªåæ¯ç¹ï¼è¡ç®¡ï¼å°æè¿èæ¯ç¹ï¼éè¡ç®¡ï¼çæ¬§å éå¾è·ç¦»ã
-    # æä»¬éè¦è·åå¾åçspacingä¿¡æ¯ï¼ä½¿å¾è·ç¦»è®¡ç®æ¯ç©çè·ç¦»ï¼ä¾å¦æ¯«ç±³ï¼ï¼èä¸æ¯åç´ åä½ã
+    # --- 生成内部距离图 (Internal Distance Map) ---
+    # 计算从每个前景点（血管）到最近背景点（非血管）的欧几里得距离。
+    # 我们需要获取图像的spacing信息，使得距离计算是物理距离（例如毫米），而不是像素单位。
     spacing = mask_image.GetSpacing()
     
-    # distance_transform_edt ä¼è®¡ç®æ¯ä¸ªéé¶ç¹å°æè¿é¶ç¹çè·ç¦»
-    # è¿æ­£æ¯æä»¬æ³è¦çåé¨è·ç¦»å¾
+    # distance_transform_edt 会计算每个非零点到最近零点的距离
+    # 这正是我们想要的内部距离图
     internal_dist_array = distance_transform_edt(mask_array, sampling=spacing)
     
-    # å°ç»æè½¬æ¢å SimpleITK å¾å
+    # 将结果转换回 SimpleITK 图像
     internal_dist_image = sitk.GetImageFromArray(internal_dist_array)
-    internal_dist_image.CopyInformation(mask_image) # å¤å¶ææåæ°æ®
+    internal_dist_image.CopyInformation(mask_image) # 复制所有元数据
 
-    # ä¿å­åé¨è·ç¦»å¾
+    # 保存内部距离图
     base_name = os.path.basename(mask_path).replace(".nii.gz", "")
     output_path_internal = os.path.join(output_dir, f"{base_name}_internal_distance.nii.gz")
     sitk.WriteImage(internal_dist_image, output_path_internal)
-    print(f"å·²ä¿å­åé¨è·ç¦»å¾å°: {output_path_internal}")
+    print(f"已保存内部距离图到: {output_path_internal}")
 
 
-    # --- çæè¾¹çå¿åºå¾ (Boundary Potential Map) ---
-    # çµææ¥æºäºæ¨æä¾çæç® "Automatic kidney segmentation..."
+    # --- 生成边界势场图 (Boundary Potential Map) ---
+    # 灵感来源于您提供的文献 "Automatic kidney segmentation..."
     
-    # a. æåè¾¹ç (åå§mask - èèåçmask)
-    # sitk.BinaryErode éè¦ä¸ä¸ªåå¾åæ°ï¼è¿éæä»¬ä½¿ç¨ä¸ä¸ªåç´ åä½ççå½¢ç»æåç´ 
-    # åå¾åä½æ¯ç©çåä½ï¼æä»¥æä»¬éè¦æ ¹æ®spacingæ¥å®
-    # ä¸ºäºç®ååéç¨ï¼æä»¬ç¨ä¸ä¸ªåç´ çèè
+    # a. 提取边界 (原始mask - 腐蚀后的mask)
+    # sitk.BinaryErode 需要一个半径参数，这里我们使用一个像素单位的球形结构元素
+    # 半径单位是物理单位，所以我们需要根据spacing来定
+    # 为了简单和通用，我们用一个像素的腐蚀
     eroded_mask_image = sitk.BinaryErode(sitk.Cast(mask_image, sitk.sitkUInt8), [1, 1, 1])
     eroded_mask_array = sitk.GetArrayFromImage(eroded_mask_image)
     
     boundary_array = mask_array - eroded_mask_array
     
-    # b. è®¡ç®å°è¾¹ççè·ç¦»
-    # æä»¬å¸æè®¡ç®æ¯ä¸ªç¹å°è¾¹ççè·ç¦»ï¼æä»¥è¾¹çç¹åºè¯¥æ¯0ï¼å¶ä»ç¹é0
-    # distance_transform_edt è®¡ç®çæ¯é0ç¹å°0ç¹çè·ç¦»
-    # æä»¥æä»¬éè¦åè½¬è¾¹çå¾ (boundary_array == 0)
+    # b. 计算到边界的距离
+    # 我们希望计算每个点到边界的距离，所以边界点应该是0，其他点非0
+    # distance_transform_edt 计算的是非0点到0点的距离
+    # 所以我们需要反转边界图 (boundary_array == 0)
     boundary_dist_array = distance_transform_edt(boundary_array == 0, sampling=spacing)
     
-    # c. ä½¿ç¨ææ°å½æ°è¿è¡å½ä¸åï¼çæå¿åº
+    # c. 使用指数函数进行归一化，生成势场
     # D(p) = exp(-lambda * dist(p, boundary))
     potential_map_array = np.exp(-lambda_param * boundary_dist_array)
     
-    # å°ç»æè½¬æ¢å SimpleITK å¾å
+    # 将结果转换回 SimpleITK 图像
     potential_map_image = sitk.GetImageFromArray(potential_map_array)
     potential_map_image.CopyInformation(mask_image)
 
-    # ä¿å­è¾¹çå¿åºå¾
+    # 保存边界势场图
     output_path_potential = os.path.join(output_dir, f"{base_name}_boundary_potential.nii.gz")
     sitk.WriteImage(potential_map_image, output_path_potential)
-    print(f"å·²ä¿å­è¾¹çå¿åºå¾å°: {output_path_potential}")
+    print(f"已保存边界势场图到: {output_path_potential}")
     print("-" * 30)
 
 if __name__ == '__main__':
-    # --- ä½¿ç¨æ¹æ³ ---
-    # 1. ç´æ¥å¨ä»£ç ä¸­ä¿®æ¹æä»¶è·¯å¾
+    # --- 使用方法 ---
+    # 1. 直接在代码中修改文件路径
     # input_mask_file = "data/parse2022/train/PA000005/label/PA000005.nii.gz"
     # output_directory = "pa005_label_distance_map.nii.gz"
     # generate_distance_maps(input_mask_file, output_directory)
 
-    # 2. ä½¿ç¨å½ä»¤è¡åæ° (æ¨è)
-    # å¨ç»ç«¯ä¸­è¿è¡:
+    # 2. 使用命令行参数 (推荐)
+    # 在终端中运行:
     # python your_script_name.py -i /path/to/mask.nii.gz -o /path/to/output
     # python your_script_name.py -i /path/to/mask_folder -o /path/to/output_folder --batch
     
-    parser = argparse.ArgumentParser(description="ä»NIfTIæ©æ¨¡çæè¡ç®¡è·ç¦»å¾")
-    parser.add_argument('-i', '--input', type=str, required=True, help="è¾å¥çæ©æ¨¡æä»¶ææä»¶å¤¹è·¯å¾ã")
-    parser.add_argument('-o', '--output', type=str, required=True, help="è¾åºç»æçä¿å­ç®å½ã")
-    parser.add_argument('-l', '--lambda_param', type=float, default=0.5, help="è¾¹çå¿åºå¾çææ°è¡°åç³»æ°ï¼è®ºæè®¾ä¸º 0.5ï¼ã")
-    parser.add_argument('--batch', action='store_true', help="å¦æè¾å¥æ¯æä»¶å¤¹ï¼åå¯ç¨æ­¤åæ°ä»¥æ¹éå¤çææ.nii.gzæä»¶ã")
+    parser = argparse.ArgumentParser(description="从NIfTI掩模生成血管距离图")
+    parser.add_argument('-i', '--input', type=str, required=True, help="输入的掩模文件或文件夹路径。")
+    parser.add_argument('-o', '--output', type=str, required=True, help="输出结果的保存目录。")
+    parser.add_argument('-l', '--lambda_param', type=float, default=0.5, help="边界势场图的指数衰减系数（论文设为 0.5）。")
+    parser.add_argument('--batch', action='store_true', help="如果输入是文件夹，则启用此参数以批量处理所有.nii.gz文件。")
     
     args = parser.parse_args()
 
     if args.batch:
         if not os.path.isdir(args.input):
-            print(f"éè¯¯ï¼æ¹éå¤çæ¨¡å¼ä¸ï¼è¾å¥è·¯å¾å¿é¡»æ¯ä¸ä¸ªæä»¶å¤¹: {args.input}")
+            print(f"错误：批量处理模式下，输入路径必须是一个文件夹: {args.input}")
         else:
             nii_files = [f for f in os.listdir(args.input) if f.endswith(".nii.gz")]
             if not nii_files:
-                print(f"éè¯¯ï¼å¨æä»¶å¤¹ {args.input} ä¸­æªæ¾å°.nii.gzæä»¶ã")
+                print(f"错误：在文件夹 {args.input} 中未找到.nii.gz文件。")
             else:
-                print(f"æ¾å° {len(nii_files)} ä¸ª .nii.gz æä»¶ï¼å¼å§æ¹éå¤ç...")
+                print(f"找到 {len(nii_files)} 个 .nii.gz 文件，开始批量处理...")
                 for file_name in nii_files:
                     file_path = os.path.join(args.input, file_name)
                     generate_distance_maps(file_path, args.output, args.lambda_param)
-                print("æææä»¶å¤çå®æ¯ï¼")
+                print("所有文件处理完毕！")
     else:
         if not os.path.isfile(args.input):
-            print(f"éè¯¯ï¼åä¸ªæä»¶å¤çæ¨¡å¼ä¸ï¼è¾å¥è·¯å¾å¿é¡»æ¯ä¸ä¸ªæä»¶: {args.input}")
+            print(f"错误：单个文件处理模式下，输入路径必须是一个文件: {args.input}")
         else:
             generate_distance_maps(args.input, args.output, args.lambda_param)
