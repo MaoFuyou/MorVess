@@ -13,18 +13,16 @@ from segment_anything import sam_model_registry
 
 from trainer_hq_parse import trainer_run
 from icecream import ic
-import os 
-os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 parser = argparse.ArgumentParser()
 '''
 AIIB2023 /home/ET/bnwu/MA-SAM/data/AIIB23_Train_T1/2D_all_5slice
 '''
-parser.add_argument('--root_path', type=str, default='/home/ET/bnwu/MA-SAM/data/parse2022/train/2D_all_5slice', help='root dir for data')
-parser.add_argument('--output', type=str, default='/home/ET/bnwu/MA-SAM/MA-SAM/res_hq-par-512-stage1')
+parser.add_argument('--root_path', type=str, default='data/parse2022/train/2D_all_5slice', help='root dir for data')
+parser.add_argument('--output', type=str, default='./outputs/morvess-stage1')
 parser.add_argument('--num_classes', type=int, default=1, help='output channel of network')  #BTCV:13  
-parser.add_argument('--batch_size', type=int, default=1, help='batch_size per gpu')
-parser.add_argument('--n_gpu', type=int, default=4, help='total gpu')
+parser.add_argument('--batch_size', type=int, default=4, help='global batch size when n_gpu=1')
+parser.add_argument('--n_gpu', type=int, default=1, help='number of CUDA devices')
 parser.add_argument('--base_lr', type=float, default=0.000010, help='segmentation network learning rate')
 parser.add_argument('--max_epochs', type=int,default=400, help='maximum epoch numer to train')
 parser.add_argument('--stop_epoch', type=int, default=399, help='maximum epoch number to train')
@@ -32,7 +30,7 @@ parser.add_argument('--deterministic', type=int, default=1, help='whether use de
 parser.add_argument('--img_size', type=int, default=512, help='input patch size of network input')
 parser.add_argument('--seed', type=int, default=1234, help='random seed')
 parser.add_argument('--vit_name', type=str, default='vit_b', help='select one vit model')
-parser.add_argument('--ckpt', type=str, default='/home/ET/bnwu/MA-SAM/MA-SAM/pretrained_weights/sam_vit_b_01ec64.pth', help='Pretrained checkpoint')
+parser.add_argument('--ckpt', type=str, default='pretrained_weights/sam_vit_b_01ec64.pth', help='SAM ViT-B initialization checkpoint')
 parser.add_argument('--adapt_ckpt', type=str, help='Finetuned checkpoint')
 parser.add_argument('--rank', type=int, default=32, help='Rank for FacT')
 parser.add_argument('--scale', type=float, default=1.0, help='Scale for FacT')
