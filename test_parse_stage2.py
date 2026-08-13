@@ -13,7 +13,6 @@ from importlib import import_module
 from sam_fact_tt_image_encoder_hq import Fact_tt_Sam_hq
 from segment_anything import sam_model_registry
 from icecream import ic
-os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 import pandas as pd
 import pickle
 from datetime import datetime
@@ -75,17 +74,17 @@ def test_single_volume(image, label, net, classes, multimask_output, patch_size=
             # out_pred = out_pred.cpu().detach().numpy()
             # out_h, out_w = out.shape[1], out.shape[2]     
             
-            if multimask_output:  # 多目标分割
+            if multimask_output:  # å¤ç®æ åå²
                 out = torch.argmax(torch.softmax(output_masks, dim=1), dim=1)
                 out_pred = torch.softmax(output_masks, dim=1)
                 out_pred = torch.permute(out_pred, (0, 2, 3, 1))
                 out_pred = out_pred.cpu().detach().numpy()
                 out_h, out_w = out.shape[1], out.shape[2]
-            else:  # 单目标分割
+            else:  # åç®æ åå²
                 out_pred = torch.sigmoid(output_masks)
-                out = (out_pred > 0.2).float()  # 使用阈值 0.2 判断
+                out = (out_pred > 0.2).float()  # ä½¿ç¨éå¼ 0.2 å¤æ­
                 out_pred = out_pred.permute(0, 2, 3, 1) 
-                # out = out.squeeze(1)  # 去掉通道维度
+                # out = out.squeeze(1)  # å»æééç»´åº¦
                 out_pred = out_pred.cpu().detach().numpy()
                 out_h, out_w = out.shape[2], out.shape[3]
             
@@ -213,14 +212,14 @@ def config_to_dict(config):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--task', type=str, default='parse', help='Task name to determine mask processing logic')
-    parser.add_argument('--adapt_ckpt', type=str, default='/home/ET/bnwu/MA-SAM/MA-SAM/parse-512-c-1-cldi-new-finetunefrom63/epoch_29.pth', help='The checkpoint after adaptation')
-    parser.add_argument('--data_path', type=str, default='/home/ET/bnwu/MA-SAM/data/parse2022/train/2D_all_5slice')
+    parser.add_argument('--adapt_ckpt', type=str, required=True, help='MorVess checkpoint to evaluate')
+    parser.add_argument('--data_path', type=str, required=True, help='Five-slice data root containing test.csv')
     parser.add_argument('--num_classes', type=int, default=1)
-    parser.add_argument('--img_size', type=int, default=256, help='Input image size of the network')
+    parser.add_argument('--img_size', type=int, default=512, help='Input image size of the network')
     parser.add_argument('--seed', type=int, default=1234, help='random seed')
-    parser.add_argument('--is_savenii', action='store_true', help='Whether to save results during inference',default="True")
+    parser.add_argument('--is_savenii', action='store_true', help='Whether to save results during inference')
     parser.add_argument('--deterministic', type=int, default=1, help='whether use deterministic training')
-    parser.add_argument('--ckpt', type=str, default='/home/ET/bnwu/MA-SAM/MA-SAM/pretrained_weights/sam_vit_b_01ec64.pth', help='Pretrained checkpoint')
+    parser.add_argument('--ckpt', type=str, default='pretrained_weights/sam_vit_b_01ec64.pth', help='SAM ViT-B initialization checkpoint')
     parser.add_argument('--vit_name', type=str, default='vit_b', help='Select one vit model')
     parser.add_argument('--rank', type=int, default=32, help='Rank for FacT adaptation')
     parser.add_argument('--scale', type=float, default=1.0)
@@ -250,15 +249,13 @@ if __name__ == '__main__':
     # register model
     sam, img_embedding_size = sam_model_registry[args.vit_name+"_distance_thickness_hq"](image_size=args.img_size,
                                                                 num_classes=args.num_classes,
-                                                                checkpoint= "/home/ET/bnwu/MA-SAM/MA-SAM/pretrained_weights/sam_vit_b_01ec64.pth", pixel_mean=[0., 0., 0.],
+                                                                checkpoint=args.ckpt, pixel_mean=[0., 0., 0.],
                                                                 pixel_std=[1., 1., 1.])
 
     
     pkg = import_module(args.module)
     net = pkg.Fact_tt_Sam_hq(sam, args.rank, s=args.scale).cuda()
-    net.load_parameters("/home/ET/bnwu/MA-SAM/MA-SAM/res_hq-par-256/epoch_16.pth")
-    # assert args.adapt_ckpt is not None
-    # net.load_parameters(args.adapt_ckpt)
+    net.load_parameters(args.adapt_ckpt)
 
     if isinstance(net, torch.nn.DataParallel):
         net = net.module
@@ -275,7 +272,7 @@ if __name__ == '__main__':
     
     if not os.path.exists('./testing_log'):
         os.mkdir('./testing_log')
-    logging.basicConfig(filename= './testing_log/' + args.adapt_ckpt.split('/')[-3] + '_log.txt', level=logging.INFO,
+    logging.basicConfig(filename= './testing_log/' + os.path.basename(args.adapt_ckpt) + '_log.txt', level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     logging.info(str(args))
