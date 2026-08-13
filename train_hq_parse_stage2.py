@@ -13,27 +13,25 @@ from segment_anything import sam_model_registry
 
 from trainer_hq_parse_stage2 import trainer_run
 from icecream import ic
-import os 
-os.environ['CUDA_VISIBLE_DEVICES'] = "2"
 
 parser = argparse.ArgumentParser()
 '''
 AIIB2023 /home/ET/bnwu/MA-SAM/data/AIIB23_Train_T1/2D_all_5slice
 '''
-parser.add_argument('--root_path', type=str, default='/home/ET/bnwu/MA-SAM/data/parse2022/train/2D_all_5slice', help='root dir for data')
-parser.add_argument('--output', type=str, default='/home/ET/bnwu/MA-SAM/MA-SAM/res_hq-par-256-stage2')
+parser.add_argument('--root_path', type=str, default='data/parse2022/train/2D_all_5slice', help='root dir for data')
+parser.add_argument('--output', type=str, default='./outputs/morvess-stage2')
 parser.add_argument('--num_classes', type=int, default=1, help='output channel of network')  #BTCV:13  
-parser.add_argument('--batch_size', type=int, default=8, help='batch_size per gpu')
-parser.add_argument('--n_gpu', type=int, default=4, help='total gpu')
-parser.add_argument('--base_lr', type=float, default=0.000010, help='segmentation network learning rate')
-parser.add_argument('--max_epochs', type=int,default=400, help='maximum epoch numer to train')
-parser.add_argument('--stop_epoch', type=int, default=399, help='maximum epoch number to train')
+parser.add_argument('--batch_size', type=int, default=4, help='global batch size when n_gpu=1')
+parser.add_argument('--n_gpu', type=int, default=1, help='number of CUDA devices')
+parser.add_argument('--base_lr', type=float, default=0.000050, help='segmentation network learning rate')
+parser.add_argument('--max_epochs', type=int,default=200, help='maximum epoch numer to train')
+parser.add_argument('--stop_epoch', type=int, default=200, help='maximum epoch number to train')
 parser.add_argument('--deterministic', type=int, default=1, help='whether use deterministic training')
-parser.add_argument('--img_size', type=int, default=256, help='input patch size of network input')
+parser.add_argument('--img_size', type=int, default=512, help='input patch size of network input')
 parser.add_argument('--seed', type=int, default=1234, help='random seed')
 parser.add_argument('--vit_name', type=str, default='vit_b', help='select one vit model')
-parser.add_argument('--ckpt', type=str, default='/home/ET/bnwu/MA-SAM/MA-SAM/res_hq-par-256/epoch_16.pth', help='Pretrained checkpoint')
-parser.add_argument('--adapt_ckpt', type=str, help='Finetuned checkpoint')
+parser.add_argument('--ckpt', type=str, default='pretrained_weights/sam_vit_b_01ec64.pth', help='SAM ViT-B initialization checkpoint')
+parser.add_argument('--adapt_ckpt', type=str, required=True, help='Stage I adaptation checkpoint used to initialize Stage II')
 parser.add_argument('--rank', type=int, default=32, help='Rank for FacT')
 parser.add_argument('--scale', type=float, default=1.0, help='Scale for FacT')
 parser.add_argument('--warmup', action='store_true', help='If activated, warp up the learning from a lower lr to the base_lr')
@@ -78,20 +76,16 @@ if __name__ == "__main__":
     # register model
     sam, img_embedding_size = sam_model_registry[args.vit_name+"_distance_thickness_hq"](image_size=args.img_size,
                                                                 num_classes=args.num_classes,
-                                                                checkpoint= "/home/ET/bnwu/MA-SAM/MA-SAM/pretrained_weights/sam_vit_b_01ec64.pth", pixel_mean=[0., 0., 0.],
+                                                                checkpoint=args.ckpt, pixel_mean=[0., 0., 0.],
                                                                 pixel_std=[1., 1., 1.])
 
     pkg = import_module(args.module)
     net = pkg.Fact_tt_Sam_hq(sam, args.rank, s=args.scale).cuda()
     
-    net.load_parameters("/home/ET/bnwu/MA-SAM/MA-SAM/res_hq-par-256/epoch_16.pth")
-    
-    
     if args.compile:
         net = torch.compile(net)
 
-    if args.adapt_ckpt is not None:
-        net.load_parameters(args.adapt_ckpt)
+    net.load_parameters(args.adapt_ckpt)
 
     if args.num_classes > 1:
         multimask_output = True
