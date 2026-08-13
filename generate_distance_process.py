@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-此脚本用于为数据集批量生成血管距离图，并将其保存在一个独立的输出目录中，
-同时保持原始的目录层次结构。
+æ­¤èæ¬ç¨äºä¸ºæ°æ®éæ¹éçæè¡ç®¡è·ç¦»å¾ï¼å¹¶å°å¶ä¿å­å¨ä¸ä¸ªç¬ç«çè¾åºç®å½ä¸­ï¼
+åæ¶ä¿æåå§çç®å½å±æ¬¡ç»æã
 
-V4版本：移除了所有命令行参数，改用在脚本内直接指定路径和参数的方式，
-以避免环境和命令行使用问题。
+V4çæ¬ï¼ç§»é¤äºææå½ä»¤è¡åæ°ï¼æ¹ç¨å¨èæ¬åç´æ¥æå®è·¯å¾ååæ°çæ¹å¼ï¼
+ä»¥é¿åç¯å¢åå½ä»¤è¡ä½¿ç¨é®é¢ã
 
-请确保已安装必要的库:
+è¯·ç¡®ä¿å·²å®è£å¿è¦çåº:
 pip install SimpleITK numpy scipy tqdm
 
-也支持单文件模式（直接把结果写到 -o 指定目录）：
+ä¹æ¯æåæä»¶æ¨¡å¼ï¼ç´æ¥æç»æåå° -o æå®ç®å½ï¼ï¼
 python generate_distance_process.py \
   -i /home/ET/bnwu/MA-SAM/PA000005.nii.gz -o ./distance_out
   
@@ -27,33 +27,33 @@ import numpy as np
 import SimpleITK as sitk
 from scipy.ndimage import distance_transform_edt
 
-# ---------------- 核心计算：生成边界势场图 ---------------- #
+# ---------------- æ ¸å¿è®¡ç®ï¼çæè¾¹çå¿åºå¾ ---------------- #
 
 def generate_potential_map(mask_path,
                            input_root_dir=None,
                            output_root_dir=None,
                            out_subdir_name="potential_map",
-                           lambda_param=0.05,
+                           lambda_param=0.5,
                            save_all_steps=False):
     """
-    读取单个 NIfTI 掩模，生成距离图和边界势场图。
-    新增功能：当 save_all_steps=True 时，保存所有中间步骤的结果。
+    è¯»ååä¸ª NIfTI æ©æ¨¡ï¼çæè·ç¦»å¾åè¾¹çå¿åºå¾ã
+    æ°å¢åè½ï¼å½ save_all_steps=True æ¶ï¼ä¿å­ææä¸­é´æ­¥éª¤çç»æã
 
-    参数：
-      mask_path        : 掩模文件路径（.nii 或 .nii.gz）
-      input_root_dir   : 输入数据集根目录（批量时必填）
-      output_root_dir  : 输出根目录（批量时必填）
-      out_subdir_name  : 每个样本目录下的输出子目录名称
-      lambda_param     : 边界势场图的指数衰减系数
-      save_all_steps   : (新增) 是否保存所有中间步骤的结果
+    åæ°ï¼
+      mask_path        : æ©æ¨¡æä»¶è·¯å¾ï¼.nii æ .nii.gzï¼
+      input_root_dir   : è¾å¥æ°æ®éæ ¹ç®å½ï¼æ¹éæ¶å¿å¡«ï¼
+      output_root_dir  : è¾åºæ ¹ç®å½ï¼æ¹éæ¶å¿å¡«ï¼
+      out_subdir_name  : æ¯ä¸ªæ ·æ¬ç®å½ä¸çè¾åºå­ç®å½åç§°
+      lambda_param     : è¾¹çå¿åºå¾çææ°è¡°åç³»æ°
+      save_all_steps   : (æ°å¢) æ¯å¦ä¿å­ææä¸­é´æ­¥éª¤çç»æ
     """
     if not os.path.exists(mask_path):
-        print(f"[WARN] 文件不存在，跳过：{mask_path}")
+        print(f"[WARN] æä»¶ä¸å­å¨ï¼è·³è¿ï¼{mask_path}")
         return
 
-    print(f"\n--- 正在处理: {mask_path} ---")
+    print(f"\n--- æ­£å¨å¤ç: {mask_path} ---")
 
-    # ---- 组织输出路径 ----
+    # ---- ç»ç»è¾åºè·¯å¾ ----
     base_name = os.path.basename(mask_path)
     base_noext = re.sub(r'\.nii(\.gz)?$', '', base_name, flags=re.I)
     base_noext = base_noext.split('_label')[0]
@@ -67,87 +67,87 @@ def generate_potential_map(mask_path,
 
     os.makedirs(out_dir, exist_ok=True)
 
-    # ---- 预备工作：读取图像并准备保存函数 ----
+    # ---- é¢å¤å·¥ä½ï¼è¯»åå¾åå¹¶åå¤ä¿å­å½æ° ----
     mask_img = sitk.ReadImage(mask_path, sitk.sitkFloat32)
     spacing = mask_img.GetSpacing()  # (sx, sy, sz)
 
     def save_intermediate_step(data_arr, step_name):
-        """一个便捷的函数，用于保存中间步骤的 .nii.gz 文件"""
+        """ä¸ä¸ªä¾¿æ·çå½æ°ï¼ç¨äºä¿å­ä¸­é´æ­¥éª¤ç .nii.gz æä»¶"""
         if save_all_steps:
             img = sitk.GetImageFromArray(data_arr.astype(np.float32))
             img.CopyInformation(mask_img)
             filepath = os.path.join(out_dir, f"{base_noext}_{step_name}.nii.gz")
             sitk.WriteImage(img, filepath)
-            print(f"  [步骤] 已保存: {os.path.basename(filepath)}")
+            print(f"  [æ­¥éª¤] å·²ä¿å­: {os.path.basename(filepath)}")
 
-    # ---- 开始计算和保存中间步骤 ----
+    # ---- å¼å§è®¡ç®åä¿å­ä¸­é´æ­¥éª¤ ----
 
-    # 步骤 1: 二值化掩模
+    # æ­¥éª¤ 1: äºå¼åæ©æ¨¡
     mask_arr = (sitk.GetArrayFromImage(mask_img) > 0).astype(np.uint8)
     save_intermediate_step(mask_arr, "step1_binary_mask")
 
-    # 步骤 2: 计算内部距离图 (Internal Distance Map)
-    # 这是掩模内每个点到最近边界的距离（单位：mm）
+    # æ­¥éª¤ 2: è®¡ç®åé¨è·ç¦»å¾ (Internal Distance Map)
+    # è¿æ¯æ©æ¨¡åæ¯ä¸ªç¹å°æè¿è¾¹ççè·ç¦»ï¼åä½ï¼mmï¼
     internal_dist_arr = distance_transform_edt(mask_arr, sampling=spacing[::-1])
     save_intermediate_step(internal_dist_arr, "step2_internal_distance_mm")
     
-    # 步骤 3: 腐蚀掩模
-    # 使用 sitk.BinaryErode 创建一个比原始掩模小一圈的掩模
+    # æ­¥éª¤ 3: èèæ©æ¨¡
+    # ä½¿ç¨ sitk.BinaryErode åå»ºä¸ä¸ªæ¯åå§æ©æ¨¡å°ä¸åçæ©æ¨¡
     eroded_mask_img = sitk.BinaryErode(sitk.Cast(mask_img > 0, sitk.sitkUInt8), [1, 1, 1])
     eroded_mask_arr = sitk.GetArrayFromImage(eroded_mask_img)
     save_intermediate_step(eroded_mask_arr, "step3_eroded_mask")
 
-    # 步骤 4: 提取边界 (Boundary Mask)
-    # 原始掩模减去腐蚀后的掩模，得到的就是边界
+    # æ­¥éª¤ 4: æåè¾¹ç (Boundary Mask)
+    # åå§æ©æ¨¡åå»èèåçæ©æ¨¡ï¼å¾å°çå°±æ¯è¾¹ç
     boundary_arr = mask_arr - eroded_mask_arr
     save_intermediate_step(boundary_arr, "step4_boundary_mask")
 
-    # 步骤 5: 计算到边界的距离图 (Boundary Distance Map)
-    # 这是图像中所有点到“边界”的最近距离
+    # æ­¥éª¤ 5: è®¡ç®å°è¾¹ççè·ç¦»å¾ (Boundary Distance Map)
+    # è¿æ¯å¾åä¸­ææç¹å°âè¾¹çâçæè¿è·ç¦»
     boundary_dist_arr = distance_transform_edt(boundary_arr == 0, sampling=spacing[::-1])
     save_intermediate_step(boundary_dist_arr, "step5_boundary_distance_mm")
 
-    # 步骤 6: 生成边界势场图 (Boundary Potential Map)
+    # æ­¥éª¤ 6: çæè¾¹çå¿åºå¾ (Boundary Potential Map)
     potential_map_arr = np.exp(-lambda_param * boundary_dist_arr)
     save_intermediate_step(potential_map_arr, "step6_boundary_potential_map")
 
-    # ---- 保存最终结果（与原始脚本行为保持一致） ----
-    # 1. 内部距离图
+    # ---- ä¿å­æç»ç»æï¼ä¸åå§èæ¬è¡ä¸ºä¿æä¸è´ï¼ ----
+    # 1. åé¨è·ç¦»å¾
     internal_dist_img = sitk.GetImageFromArray(internal_dist_arr.astype(np.float32))
     internal_dist_img.CopyInformation(mask_img)
     out_internal_dist_path = os.path.join(out_dir, f"{base_noext}_internal_distance.nii.gz")
     sitk.WriteImage(internal_dist_img, out_internal_dist_path)
-    print(f"==> 最终内部距离图已保存: {out_internal_dist_path}")
+    print(f"==> æç»åé¨è·ç¦»å¾å·²ä¿å­: {out_internal_dist_path}")
 
-    # 2. 边界势场图
+    # 2. è¾¹çå¿åºå¾
     potential_map_img = sitk.GetImageFromArray(potential_map_arr.astype(np.float32))
     potential_map_img.CopyInformation(mask_img)
     out_potential_map_path = os.path.join(out_dir, f"{base_noext}_boundary_potential.nii.gz")
     sitk.WriteImage(potential_map_img, out_potential_map_path)
-    print(f"==> 最终边界势场图已保存: {out_potential_map_path}")
+    print(f"==> æç»è¾¹çå¿åºå¾å·²ä¿å­: {out_potential_map_path}")
 
 
-# ---------------- 入口：与之前脚本一致的“递归批量” ---------------- #
+# ---------------- å¥å£ï¼ä¸ä¹åèæ¬ä¸è´çâéå½æ¹éâ ---------------- #
 
 def main():
-    parser = argparse.ArgumentParser(description="从 NIfTI 掩模生成距离图和边界势场图，并可选择保存所有中间步骤。")
+    parser = argparse.ArgumentParser(description="ä» NIfTI æ©æ¨¡çæè·ç¦»å¾åè¾¹çå¿åºå¾ï¼å¹¶å¯éæ©ä¿å­ææä¸­é´æ­¥éª¤ã")
     parser.add_argument('-i', '--input',  type=str, required=True,
-                        help="输入路径：单文件 或 数据集根目录（含若干 <sample>/label/*.nii.gz）")
+                        help="è¾å¥è·¯å¾ï¼åæä»¶ æ æ°æ®éæ ¹ç®å½ï¼å«è¥å¹² <sample>/label/*.nii.gzï¼")
     parser.add_argument('-o', '--output', type=str, required=True,
-                        help="输出根目录（批量时会按原层级写入；单文件时直接写到该目录）")
+                        help="è¾åºæ ¹ç®å½ï¼æ¹éæ¶ä¼æåå±çº§åå¥ï¼åæä»¶æ¶ç´æ¥åå°è¯¥ç®å½ï¼")
     parser.add_argument('--batch', action='store_true',
-                        help="批量模式：从输入根目录递归查找 label/*.nii.gz 并批量处理")
+                        help="æ¹éæ¨¡å¼ï¼ä»è¾å¥æ ¹ç®å½éå½æ¥æ¾ label/*.nii.gz å¹¶æ¹éå¤ç")
     parser.add_argument('--out_subdir', type=str, default='potential_map',
-                        help="每个样本目录下的输出子目录名（默认 potential_map）")
-    parser.add_argument('--lambda', type=float, default=0.05, dest='lambda_param',
-                        help="边界势场图的指数衰减系数 (默认 0.05)")
+                        help="æ¯ä¸ªæ ·æ¬ç®å½ä¸çè¾åºå­ç®å½åï¼é»è®¤ potential_mapï¼")
+    parser.add_argument('--lambda', type=float, default=0.5, dest='lambda_param',
+                        help="è¾¹çå¿åºå¾çææ°è¡°åç³»æ°ï¼è®ºæè®¾ä¸º 0.5ï¼")
     parser.add_argument('--save_all_steps', action='store_true',default=True,
-                        help="（新增）保存所有计算的中间步骤文件，用于展示和调试")
+                        help="ï¼æ°å¢ï¼ä¿å­ææè®¡ç®çä¸­é´æ­¥éª¤æä»¶ï¼ç¨äºå±ç¤ºåè°è¯")
     args = parser.parse_args()
 
     if args.batch:
         if not os.path.isdir(args.input):
-            raise ValueError(f"批量模式下，--input 必须是目录：{args.input}")
+            raise ValueError(f"æ¹éæ¨¡å¼ä¸ï¼--input å¿é¡»æ¯ç®å½ï¼{args.input}")
         files = []
         for root, dirs, fs in os.walk(args.input):
             if os.path.basename(root) == 'label':
@@ -155,9 +155,9 @@ def main():
                     if f.endswith('.nii') or f.endswith('.nii.gz'):
                         files.append(os.path.join(root, f))
         if not files:
-            raise RuntimeError(f"未在 {args.input} 下找到任何 label/*.nii[.gz] 文件")
+            raise RuntimeError(f"æªå¨ {args.input} ä¸æ¾å°ä»»ä½ label/*.nii[.gz] æä»¶")
 
-        print(f"共找到 {len(files)} 个 label 掩模，开始处理……")
+        print(f"å±æ¾å° {len(files)} ä¸ª label æ©æ¨¡ï¼å¼å§å¤çâ¦â¦")
         for p in files:
             generate_potential_map(
                 p,
@@ -167,11 +167,11 @@ def main():
                 lambda_param=args.lambda_param,
                 save_all_steps=args.save_all_steps
             )
-        print("\n全部处理完成。")
+        print("\nå¨é¨å¤çå®æã")
     else:
-        # 单文件模式
+        # åæä»¶æ¨¡å¼
         if not os.path.isfile(args.input):
-            raise ValueError(f"单文件模式下，--input 必须是文件：{args.input}")
+            raise ValueError(f"åæä»¶æ¨¡å¼ä¸ï¼--input å¿é¡»æ¯æä»¶ï¼{args.input}")
         os.makedirs(args.output, exist_ok=True)
         generate_potential_map(
             args.input,
@@ -181,7 +181,7 @@ def main():
             lambda_param=args.lambda_param,
             save_all_steps=args.save_all_steps
         )
-        print("\n处理完成。")
+        print("\nå¤çå®æã")
 
 if __name__ == '__main__':
     main()
