@@ -74,17 +74,17 @@ def test_single_volume(image, label, net, classes, multimask_output, patch_size=
             # out_pred = out_pred.cpu().detach().numpy()
             # out_h, out_w = out.shape[1], out.shape[2]     
             
-            if multimask_output:  # å¤ç®æ åå²
+            if multimask_output:  # 多目标分割
                 out = torch.argmax(torch.softmax(output_masks, dim=1), dim=1)
                 out_pred = torch.softmax(output_masks, dim=1)
                 out_pred = torch.permute(out_pred, (0, 2, 3, 1))
                 out_pred = out_pred.cpu().detach().numpy()
                 out_h, out_w = out.shape[1], out.shape[2]
-            else:  # åç®æ åå²
+            else:  # 单目标分割
                 out_pred = torch.sigmoid(output_masks)
-                out = (out_pred > 0.2).float()  # ä½¿ç¨éå¼ 0.2 å¤æ­
+                out = (out_pred > 0.2).float()  # 使用阈值 0.2 判断
                 out_pred = out_pred.permute(0, 2, 3, 1) 
-                # out = out.squeeze(1)  # å»æééç»´åº¦
+                # out = out.squeeze(1)  # 去掉通道维度
                 out_pred = out_pred.cpu().detach().numpy()
                 out_h, out_w = out.shape[2], out.shape[3]
             
